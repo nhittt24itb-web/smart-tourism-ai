@@ -1,0 +1,1141 @@
+<!DOCTYPE html>
+<html lang="vi" class="scroll-smooth">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>Bản Đồ Tương Tác Radar AI - Smart Tourism AI</title>
+
+  <!-- Google Fonts: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  
+  <!-- Material Symbols & Bootstrap Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+  <!-- Bootstrap 5 CSS & JS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Leaflet CSS & JS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <!-- Leaflet MarkerCluster CSS & JS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
+  <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    :root {
+      --emerald-50: #ecfdf5;
+      --emerald-100: #d1fae5;
+      --emerald-600: #059669;
+      --emerald-700: #047857;
+      --emerald-800: #065f46;
+      --emerald-900: #064e3b;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: #f8fafc;
+      color: #131b2e;
+      overflow-x: hidden;
+      margin: 0;
+      padding: 0;
+    }
+
+    .nav-glass {
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(16px);
+      border-radius: 16px;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .logo-badge {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background-color: var(--emerald-700);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-weight: bold;
+    }
+
+    .nav-link-custom {
+      color: #64748b;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 13px;
+      transition: color 0.2s ease;
+      white-space: nowrap;
+    }
+    .nav-link-custom:hover {
+      color: var(--emerald-700);
+    }
+    .nav-link-custom.active {
+      color: var(--emerald-700) !important;
+      font-weight: 800;
+    }
+
+    .user-profile-btn {
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(5, 150, 105, 0.25);
+      border-radius: 9999px;
+      padding: 4px 14px 4px 6px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+      cursor: pointer;
+    }
+    .user-avatar-circle {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: var(--emerald-800);
+      color: #ffffff;
+      font-weight: 700;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .user-dropdown-menu {
+      border-radius: 16px;
+      border: 1px solid #f1f5f9;
+      box-shadow: 0 15px 30px -5px rgba(0, 0, 0, 0.12);
+      padding: 8px;
+      min-width: 190px;
+    }
+
+    #main-leaflet-map {
+      position: absolute;
+      inset: 0;
+      width: 100% !important;
+      height: 100% !important;
+      z-index: 1;
+    }
+    .leaflet-control-zoom {
+      display: none !important;
+    }
+
+    .custom-radar-pin {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+    .custom-radar-pin .pin-core {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: #064e3b;
+      color: #ffffff;
+      border: 2px solid #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+      transition: transform 0.2s ease;
+    }
+    .custom-radar-pin:hover .pin-core {
+      transform: scale(1.2);
+      background: #047857;
+    }
+    .custom-radar-pin .pin-badge {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      background: #f59e0b;
+      color: #0f172a;
+      font-size: 9px;
+      font-weight: 800;
+      padding: 1px 5px;
+      border-radius: 9999px;
+      border: 1px solid #ffffff;
+    }
+
+    /* Tinh chỉnh MarkerCluster */
+    .marker-cluster-small {
+      background-color: rgba(16, 185, 129, 0.6) !important;
+    }
+    .marker-cluster-small div {
+      background-color: rgba(5, 150, 105, 0.9) !important;
+      color: #ffffff !important;
+      font-weight: 800 !important;
+    }
+    .marker-cluster-medium {
+      background-color: rgba(245, 158, 11, 0.6) !important;
+    }
+    .marker-cluster-medium div {
+      background-color: rgba(217, 119, 6, 0.9) !important;
+      color: #ffffff !important;
+      font-weight: 800 !important;
+    }
+
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+    .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: rgba(6, 78, 59, 0.2);
+      border-radius: 10px;
+    }
+  </style>
+</head>
+
+<body class="antialiased flex flex-col min-h-screen">
+
+  <!-- NAVBAR -->
+  <div class="fixed top-0 left-0 right-0 z-50 px-4 pt-3 max-w-[1440px] mx-auto w-full">
+    <header class="nav-glass">
+      <a href="index.html" class="flex items-center gap-3 text-decoration-none">
+        <div class="logo-badge">
+          <i class="bi bi-stars text-lg"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="text-base font-bold text-slate-900 tracking-tight">Smart Tourism <span style="color: var(--emerald-700);">AI</span></span>
+            <span class="px-2 py-0.5 rounded-full text-[9px] font-bold" style="background-color: var(--emerald-100); color: var(--emerald-800);">TÍCH HỢP AI</span>
+          </div>
+          <span class="text-[11px] font-semibold text-slate-400 block leading-none mt-0.5">Bản đồ du lịch thời gian thực</span>
+        </div>
+      </a>
+
+      <nav id="main-nav-links" class="flex items-center gap-4 lg:gap-6">
+        <a href="index.html" class="nav-link-custom">Trang Chủ</a>
+        <a href="explore.html" class="nav-link-custom">Khám Phá</a>
+        <a href="map.html" class="nav-link-custom active">Bản Đồ</a>
+        <a href="favorites.html" class="nav-link-custom">Yêu thích</a>
+        <a href="trip-planner.html" class="nav-link-custom">Lập Lịch Trình</a>
+      </nav>
+
+      <div class="flex items-center gap-2">
+        <a href="explore.html" class="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition text-decoration-none" title="Tìm kiếm">
+          <i class="bi bi-search text-sm"></i>
+        </a>
+
+        <div id="nav-user-area">
+          <a href="signin.html" id="nav-login-btn" class="btn btn-sm rounded-pill px-4 text-white font-bold flex items-center gap-2" style="background-color: var(--emerald-800);">
+            <span>Đăng Nhập</span>
+            <i class="bi bi-arrow-right"></i>
+          </a>
+        </div>
+      </div>
+    </header>
+  </div>
+
+  <!-- MAIN HUD -->
+  <main class="w-full pt-20 flex-1 flex flex-col relative" style="height: calc(100vh); overflow: hidden;">
+    <!-- Top HUD -->
+    <div class="w-full bg-white/95 backdrop-blur-xl shadow-sm z-30 px-4 sm:px-6 py-2 flex flex-col gap-2 border-b border-slate-200/80">
+      <div class="max-w-[1440px] w-full mx-auto flex flex-wrap items-center justify-between gap-3">
+        
+        <!-- Tìm kiếm và chọn Thành phố -->
+        <div class="flex items-center gap-2 flex-1 max-w-xl min-w-[280px]">
+          <select id="map-city-filter" onchange="onCityFilterChanged()" 
+            class="bg-slate-100 hover:bg-slate-200 border border-slate-200 rounded-full px-3 py-1.5 text-xs font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-600 transition cursor-pointer">
+            <option value="all">🇻🇳 Toàn quốc</option>
+            <option value="Đà Nẵng" selected>📍 Đà Nẵng</option>
+            <option value="Hà Nội">📍 Hà Nội</option>
+            <option value="Thành phố Hồ Chí Minh">📍 TP. Hồ Chí Minh</option>
+            <option value="Quảng Nam">📍 Hội An (Quảng Nam)</option>
+            <option value="Lâm Đồng">📍 Đà Lạt (Lâm Đồng)</option>
+            <option value="Quảng Ninh">📍 Hạ Long (Quảng Ninh)</option>
+            <option value="Ninh Bình">📍 Ninh Bình</option>
+            <option value="Khánh Hòa">📍 Nha Trang (Khánh Hòa)</option>
+            <option value="Huế">📍 Thừa Thiên Huế</option>
+          </select>
+
+          <div class="relative w-full flex items-center flex-1">
+            <span class="material-symbols-outlined absolute left-3 text-slate-400 text-[20px] pointer-events-none">search</span>
+            <input id="map-search-input" onkeyup="if(event.key==='Enter') searchOnMap()"
+              class="w-full pl-10 pr-10 py-1.5 rounded-full bg-slate-100 text-slate-800 text-xs font-semibold placeholder:text-slate-400 focus:outline-none focus:bg-white focus:ring-2 focus:ring-emerald-600 transition"
+              placeholder="Tìm kiếm địa điểm, di tích trên bản đồ..." type="text">
+            <button onclick="searchOnMap()" aria-label="Tìm kiếm" class="absolute right-1.5 w-7 h-7 rounded-full bg-emerald-800 text-white flex items-center justify-center hover:bg-emerald-900 transition">
+              <span class="material-symbols-outlined text-[15px]">arrow_forward</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-3 shrink-0">
+          <button class="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-900 text-white text-xs font-bold shadow-sm hover:bg-emerald-800 transition" id="radar-toggle-btn" type="button">
+            <span class="relative flex h-2.5 w-2.5">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-400"></span>
+            </span>
+            <span class="text-emerald-300 font-extrabold">AI Radar:</span>
+            <span id="radar-status-text">Đang Quét</span>
+          </button>
+
+          <div class="hidden md:flex items-center bg-slate-100 p-0.5 rounded-full text-xs font-bold">
+            <button onclick="changeMapLayer('street', this)" class="map-layer-btn px-3 py-1 rounded-full bg-white text-emerald-800 shadow-sm flex items-center gap-1 active">
+              <span class="material-symbols-outlined text-[15px]">map</span>
+              <span>Đường phố</span>
+            </button>
+            <button onclick="changeMapLayer('satellite', this)" class="map-layer-btn px-3 py-1 rounded-full text-slate-600 hover:text-emerald-800 flex items-center gap-1">
+              <span class="material-symbols-outlined text-[15px]">satellite_alt</span>
+              <span>Vệ tinh GIS</span>
+            </button>
+          </div>
+
+          <button class="w-9 h-9 rounded-full bg-slate-100 text-slate-700 flex items-center justify-center hover:bg-slate-200 transition shadow-sm" id="drawer-toggle-btn" title="Đóng/Mở danh sách" type="button">
+            <span class="material-symbols-outlined text-[20px]">view_sidebar</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Filter Chips -->
+      <div class="max-w-[1440px] w-full mx-auto flex items-center gap-2 overflow-x-auto no-scrollbar py-0.5">
+        <button onclick="filterCategory('all', this)" class="cat-chip-btn px-3.5 py-1 rounded-full bg-emerald-800 text-white text-[11px] font-extrabold whitespace-nowrap shadow-sm active">
+          Tất cả danh mục (<span id="total-count-badge">0</span>)
+        </button>
+        <button onclick="filterCategory('văn hóa', this)" class="cat-chip-btn px-3.5 py-1 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-bold whitespace-nowrap transition flex items-center gap-1">
+          <span class="material-symbols-outlined text-[14px] text-emerald-700">temple_buddhist</span>
+          <span>Di tích & Văn hóa</span>
+        </button>
+        <button onclick="filterCategory('biển', this)" class="cat-chip-btn px-3.5 py-1 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-bold whitespace-nowrap transition flex items-center gap-1">
+          <span class="material-symbols-outlined text-[14px] text-teal-600">waves</span>
+          <span>Biển &amp; Đảo</span>
+        </button>
+        <button onclick="filterCategory('thiên nhiên', this)" class="cat-chip-btn px-3.5 py-1 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-bold whitespace-nowrap transition flex items-center gap-1">
+          <span class="material-symbols-outlined text-[14px] text-green-600">forest</span>
+          <span>Thiên nhiên</span>
+        </button>
+        <button onclick="filterCategory('ẩm thực', this)" class="cat-chip-btn px-3.5 py-1 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-bold whitespace-nowrap transition flex items-center gap-1">
+          <span class="material-symbols-outlined text-[14px] text-amber-600">restaurant</span>
+          <span>Ẩm thực</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Map & Drawer Frame -->
+    <div class="relative w-full flex-1 overflow-hidden" style="min-height: 500px;">
+      <div id="main-leaflet-map"></div>
+
+      <!-- Left Drawer -->
+      <aside class="absolute top-4 left-4 bottom-4 w-[380px] max-w-[calc(100vw-2rem)] z-20 flex flex-col bg-white/95 backdrop-blur-2xl rounded-2xl shadow-2xl border border-slate-200/90 overflow-hidden transition-transform duration-300" id="destination-drawer">
+        <div class="p-3.5 pb-2 flex flex-col gap-1.5 shrink-0 bg-white/90 border-b border-slate-100">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <h2 class="font-extrabold text-slate-900 text-base mb-0">Khám Phá Xung Quanh</h2>
+              <span id="drawer-count-badge" class="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 text-[10px] font-bold border border-emerald-200">
+                0 điểm
+              </span>
+            </div>
+            <button onclick="sortDrawerCards()" aria-label="Sắp xếp" class="w-7 h-7 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-600 transition" title="Sắp xếp">
+              <span class="material-symbols-outlined text-[16px]">swap_vert</span>
+            </button>
+          </div>
+          
+          <div class="flex items-center justify-between text-[11px] text-slate-500 bg-slate-50 px-2.5 py-1.5 rounded-xl border border-slate-200/60">
+            <span class="flex items-center gap-1 font-semibold truncate" id="drawer-region-label">
+              <span class="material-symbols-outlined text-[13px] text-emerald-700">location_on</span>
+              Khu Vực Đà Nẵng
+            </span>
+            <span class="flex items-center gap-1 text-emerald-700 font-extrabold shrink-0">
+              <span class="material-symbols-outlined text-[13px]">auto_awesome</span>
+              AI Match > 88%
+            </span>
+          </div>
+        </div>
+
+        <div id="drawer-card-list" class="flex-1 overflow-y-auto p-3 flex flex-col gap-2.5 custom-scrollbar"></div>
+      </aside>
+
+      <!-- Map Control Buttons -->
+      <div class="absolute top-4 right-4 z-20 flex flex-col items-center gap-2">
+        <div class="bg-white/95 backdrop-blur-xl rounded-2xl shadow-xl p-1 flex flex-col gap-1 border border-slate-200">
+          <button onclick="map.zoomIn()" aria-label="Phóng to" class="w-9 h-9 rounded-xl hover:bg-slate-100 flex items-center justify-center text-slate-700 transition">
+            <span class="material-symbols-outlined text-[18px]">add</span>
+          </button>
+          <div class="w-5 h-[1px] bg-slate-200 self-center"></div>
+          <button onclick="map.zoomOut()" aria-label="Thu nhỏ" class="w-9 h-9 rounded-xl hover:bg-slate-100 flex items-center justify-center text-slate-700 transition">
+            <span class="material-symbols-outlined text-[18px]">remove</span>
+          </button>
+        </div>
+
+        <div class="bg-white/95 backdrop-blur-xl rounded-2xl shadow-xl p-1 flex flex-col gap-1 border border-slate-200">
+          <button onclick="resetMapView()" class="w-9 h-9 rounded-xl hover:bg-slate-100 flex items-center justify-center text-rose-500 transition" title="Đặt lại góc nhìn">
+            <span class="material-symbols-outlined text-[18px]">explore</span>
+          </button>
+          <button onclick="locateUserGPS()" class="w-9 h-9 rounded-xl hover:bg-slate-100 flex items-center justify-center text-emerald-700 transition" title="GPS">
+            <span class="material-symbols-outlined text-[18px]">my_location</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- POPUP MODAL CHI TIẾT ĐỒNG BỘ -->
+  <div id="detail-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm">
+    <div class="bg-white border border-slate-100 rounded-3xl max-w-lg w-full overflow-hidden shadow-2xl max-h-[90vh] flex flex-col relative text-slate-800">
+      
+      <button onclick="closeModal()" class="absolute top-4 right-4 z-20 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full backdrop-blur-md transition">
+        <i class="bi bi-x-lg text-sm"></i>
+      </button>
+
+      <!-- Ảnh Header Modal -->
+      <div class="relative h-56 w-full bg-slate-200 shrink-0">
+        <img id="m-image" src="" class="w-full h-full object-cover">
+        <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent"></div>
+        <div class="absolute bottom-4 left-5 right-5 flex justify-between items-end">
+          <div>
+            <span id="m-badge" class="bg-emerald-700 text-white text-[10px] font-extrabold px-2.5 py-1 rounded-full mb-1 inline-block">
+              Danh mục
+            </span>
+            <h2 id="m-title" class="text-xl font-black text-white leading-tight mb-0"></h2>
+          </div>
+          <span id="m-rating-badge" class="bg-amber-400 text-slate-900 text-xs font-black px-2.5 py-1 rounded-full shrink-0">
+            ★ 5.0
+          </span>
+        </div>
+      </div>
+
+      <!-- Thân Modal có thanh cuộn -->
+      <div class="p-6 overflow-y-auto space-y-4 text-xs font-medium text-slate-600">
+        <div>
+          <span class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider block mb-1">Địa chỉ</span>
+          <p id="m-address" class="text-slate-800 font-bold flex items-center gap-1 mb-0">
+            <span class="material-symbols-outlined text-[16px] text-emerald-700">location_on</span>
+            <span></span>
+          </p>
+        </div>
+
+        <div>
+          <span class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider block mb-1">Mô tả</span>
+          <p id="m-description" class="leading-relaxed mb-0"></p>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3 pt-1">
+          <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200">
+            <span class="text-[10px] font-extrabold text-slate-400 uppercase block mb-0.5">Chi phí tham khảo</span>
+            <span id="m-price" class="text-xs font-extrabold text-emerald-700"></span>
+          </div>
+          <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200">
+            <span class="text-[10px] font-extrabold text-slate-400 uppercase block mb-0.5">Tọa độ vệ tinh</span>
+            <span id="m-coords" class="text-xs font-bold text-slate-700"></span>
+          </div>
+        </div>
+
+        <!-- KHỐI ĐÁNH GIÁ THỰC TẾ TỪ CƠ SỞ DỮ LIỆU -->
+        <div class="mt-4 pt-3 border-t border-slate-200">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-[11px] font-extrabold uppercase text-slate-500">Đánh giá từ cộng đồng</span>
+            <span id="m-review-badge" class="text-xs font-bold text-amber-600">0 lượt nhận xét</span>
+          </div>
+
+          <!-- Form đánh giá -->
+          <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200/80 mb-3">
+            <div class="text-[11px] font-bold text-slate-700 mb-1.5 flex items-center justify-between">
+              <span>Đánh giá của bạn:</span>
+              <div id="star-picker" class="flex gap-1 text-base text-slate-300 cursor-pointer select-none">
+                <span onclick="setRating(1)" class="star-item text-amber-500">★</span>
+                <span onclick="setRating(2)" class="star-item text-amber-500">★</span>
+                <span onclick="setRating(3)" class="star-item text-amber-500">★</span>
+                <span onclick="setRating(4)" class="star-item text-amber-500">★</span>
+                <span onclick="setRating(5)" class="star-item text-amber-500">★</span>
+              </div>
+            </div>
+            
+            <div class="flex gap-2 mt-2">
+              <input type="text" id="review-comment-input" placeholder="Chia sẻ trải nghiệm của bạn tại đây..." 
+                class="flex-1 bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-xs font-semibold text-slate-700 focus:outline-none focus:border-emerald-600">
+              <button onclick="submitRealReview()" class="px-3.5 py-1.5 rounded-xl bg-emerald-800 hover:bg-emerald-900 text-white text-xs font-bold transition">
+                Gửi
+              </button>
+            </div>
+          </div>
+
+          <!-- Danh sách nhận xét -->
+          <div id="reviews-list-container" class="space-y-2 max-h-36 overflow-y-auto pr-1">
+            <p class="text-slate-400 text-[11px] italic mb-0">Chưa có đánh giá nào. Hãy là người đầu tiên trải nghiệm!</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chân Modal -->
+      <div class="p-4 bg-slate-50 border-t border-slate-200 flex gap-3 shrink-0">
+        <button type="button" id="m-map-btn" class="flex-1 bg-emerald-700 hover:bg-emerald-800 text-white font-bold py-2.5 rounded-xl text-center text-xs flex items-center justify-center gap-2 transition border-0 cursor-pointer">
+          <span class="material-symbols-outlined text-[16px]">navigation</span> Chỉ đường Maps
+        </button>
+        <button onclick="closeModal()" class="px-5 py-2.5 rounded-xl border border-slate-200 text-xs font-bold hover:bg-slate-100 transition">
+          Đóng
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="assets/js/sync-ai.js"></script>
+  <script src="assets/js/google-maps-directions.js"></script>
+
+  <!-- JAVASCRIPT CONTROLLERS -->
+  <script>
+    const API_BASE = "http://127.0.0.1:8000/api";
+
+    // NGUỒN TILES OPENSTREETMAP CHUẨN (MIỄN PHÍ, SẠCH WATERMARK BẢN QUYỀN)
+    const TILE_SERVERS = {
+      street: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+      satellite: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
+    };
+
+    // Tọa độ trung tâm các thành phố phổ biến
+    const CITY_CENTER_MAP = {
+      "Đà Nẵng": [16.0544, 108.2022],
+      "Hà Nội": [21.0285, 105.8542],
+      "Thành phố Hồ Chí Minh": [10.8231, 106.6297],
+      "Quảng Nam": [15.8801, 108.3380],
+      "Lâm Đồng": [11.9404, 108.4583],
+      "Quảng Ninh": [20.9505, 107.0734],
+      "Ninh Bình": [20.2506, 105.9745],
+      "Khánh Hòa": [12.2388, 109.1967],
+      "Huế": [16.4637, 107.5909]
+    };
+
+    let map = null;
+    let markersLayer = null;
+    let currentTileLayer = null;
+    let allDestinations = [];
+    let displayedDestinations = [];
+    let isSortAsc = false;
+    let selectedRatingStars = 5;
+    let currentActiveDestId = null;
+    let currentSelectedCategory = 'all';
+
+    const localGallery = [
+      'assets/images/anh1.jpg',
+      'assets/images/anh2.jpg',
+      'assets/images/ba na hill, da nang.jpg',
+      'assets/images/da lat.jpg',
+      'assets/images/dong son doong.jpg',
+      'assets/images/ho hoan kiem, ha noi.jpg',
+      'assets/images/hoian.jpg',
+      'assets/images/nha trang.jpg'
+    ];
+
+    function getFavorites() {
+      try {
+        if (typeof window.getFavorites === 'function') return window.getFavorites();
+        return JSON.parse(localStorage.getItem('user_favorites') || '[]').map(Number);
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function setRating(stars) {
+      selectedRatingStars = stars;
+      const starEls = document.querySelectorAll('#star-picker .star-item');
+      starEls.forEach((el, idx) => {
+        if (idx < stars) {
+          el.classList.add('text-amber-500');
+          el.classList.remove('text-slate-300');
+        } else {
+          el.classList.remove('text-amber-500');
+          el.classList.add('text-slate-300');
+        }
+      });
+    }
+
+    async function loadReviewsForDestination(destId) {
+      currentActiveDestId = destId;
+      setRating(5);
+      const inputEl = document.getElementById('review-comment-input');
+      if (inputEl) inputEl.value = '';
+
+      const listContainer = document.getElementById('reviews-list-container');
+      if (!listContainer) return;
+      listContainer.innerHTML = `<p class="text-slate-400 text-[11px] mb-0">Đang nạp đánh giá...</p>`;
+
+      try {
+        const res = await fetch(`${API_BASE}/destinations/${destId}/reviews`);
+        if (res.ok) {
+          const reviews = await res.json();
+          const badge = document.getElementById('m-review-badge');
+          if (badge) badge.innerText = `${reviews.length} nhận xét`;
+
+          if (reviews.length === 0) {
+            listContainer.innerHTML = `<p class="text-slate-400 text-[11px] italic mb-0">Chưa có đánh giá nào cho điểm đến này. Hãy là người đầu tiên!</p>`;
+            return;
+          }
+
+          listContainer.innerHTML = reviews.map(r => `
+            <div class="bg-white p-2.5 rounded-xl border border-slate-100 text-[11px] shadow-sm">
+              <div class="flex items-center justify-between mb-0.5">
+                <span class="font-bold text-slate-800">${r.user_name}</span>
+                <span class="text-amber-500 font-bold">${'★'.repeat(r.rating)}</span>
+              </div>
+              <p class="text-slate-600 mb-0.5">${r.comment}</p>
+              <span class="text-slate-400 text-[9px]">${r.created_at}</span>
+            </div>
+          `).join('');
+        }
+      } catch (e) {
+        listContainer.innerHTML = `<p class="text-slate-400 text-[11px] mb-0">Không thể tải đánh giá từ máy chủ.</p>`;
+      }
+    }
+
+    async function submitRealReview() {
+      if (!currentActiveDestId) return;
+
+      const commentVal = document.getElementById('review-comment-input').value.trim();
+      const userStr = localStorage.getItem('user');
+      const user = userStr ? JSON.parse(userStr) : null;
+      const userId = user ? user.id : 1;
+
+      try {
+        const res = await fetch(`${API_BASE}/destinations/review`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            destination_id: currentActiveDestId,
+            user_id: userId,
+            rating: selectedRatingStars,
+            comment: commentVal
+          })
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          const ratingBadge = document.getElementById('m-rating-badge');
+          if (ratingBadge) {
+            ratingBadge.innerText = `★ ${Number(data.new_rating).toFixed(1)}`;
+          }
+
+          alert(`Cảm ơn bạn! Hệ thống đã ghi nhận đánh giá ${selectedRatingStars} sao.`);
+          loadReviewsForDestination(currentActiveDestId);
+        } else {
+          alert('Không thể gửi đánh giá, vui lòng kiểm tra lại!');
+        }
+      } catch (err) {
+        alert('Lỗi kết nối tới máy chủ!');
+      }
+    }
+
+    function resolveImage(item, index) {
+      if (item.featured_image && typeof item.featured_image === 'string' && item.featured_image.trim() !== '') {
+        const img = item.featured_image.trim();
+        if (img.startsWith('http://') || img.startsWith('https://') || img.startsWith('assets/')) {
+          return img;
+        }
+      }
+      return localGallery[index % localGallery.length];
+    }
+
+    function checkUserSession() {
+      const userStr = localStorage.getItem('user');
+      const userArea = document.getElementById('nav-user-area');
+      if (!userArea) return;
+
+      if (userStr) {
+        try {
+          const user = JSON.parse(userStr);
+          const displayName = user.full_name || user.name || (user.email ? user.email.split('@')[0] : 'Nhi');
+          const firstChar = displayName.charAt(0).toUpperCase();
+
+          userArea.innerHTML = `
+            <div class="dropdown">
+              <div class="user-profile-btn" data-bs-toggle="dropdown" aria-expanded="false">
+                <div class="user-avatar-circle">${firstChar}</div>
+                <div class="text-left hidden sm:block">
+                  <span class="block text-slate-800 font-bold text-xs leading-none">${displayName}</span>
+                  <span class="block text-slate-400 text-[10px] leading-none mt-0.5">Thành viên VIP</span>
+                </div>
+                <i class="bi bi-chevron-down text-slate-400 text-[11px]"></i>
+              </div>
+
+              <ul class="dropdown-menu dropdown-menu-end user-dropdown-menu mt-2">
+                <li class="px-3 py-2 border-bottom mb-1">
+                  <span class="block text-[10px] text-slate-400">Đã đăng nhập bằng</span>
+                  <span class="block text-xs font-bold text-slate-800 truncate max-w-[170px]">${user.email || ''}</span>
+                </li>
+                <li>
+                  <button class="dropdown-item text-danger text-xs font-bold py-2" onclick="logout()">
+                    <i class="bi bi-box-arrow-right mr-2"></i>Đăng xuất
+                  </button>
+                </li>
+              </ul>
+            </div>
+          `;
+        } catch (e) {}
+      }
+    }
+
+    function logout() {
+      localStorage.removeItem('user');
+      localStorage.removeItem('token');
+      window.location.reload();
+    }
+
+    // KHỞI TẠO BẢN ĐỒ VỚI MARKER CLUSTERING
+    function initMap() {
+      map = L.map('main-leaflet-map', {
+        zoomControl: false,
+        attributionControl: false
+      }).setView([16.0544, 108.2022], 12);
+
+      currentTileLayer = L.tileLayer(TILE_SERVERS.street, {
+        maxZoom: 19
+      }).addTo(map);
+
+      // KHỞI TẠO CỤM MARKER
+      markersLayer = L.markerClusterGroup({
+        showCoverageOnHover: false,
+        maxClusterRadius: 45,
+        spiderfyOnMaxZoom: true,
+        disableClusteringAtZoom: 16
+      });
+      map.addLayer(markersLayer);
+
+      setTimeout(() => {
+        if (map) map.invalidateSize();
+      }, 300);
+    }
+
+    function changeMapLayer(type, btn) {
+      document.querySelectorAll('.map-layer-btn').forEach(b => {
+        b.classList.remove('bg-white', 'text-emerald-800', 'shadow-sm', 'active');
+        b.classList.add('text-slate-600');
+      });
+      btn.classList.add('bg-white', 'text-emerald-800', 'shadow-sm', 'active');
+      btn.classList.remove('text-slate-600');
+
+      if (currentTileLayer) map.removeLayer(currentTileLayer);
+      currentTileLayer = L.tileLayer(TILE_SERVERS[type] || TILE_SERVERS.street, { maxZoom: 19 }).addTo(map);
+    }
+
+    function resetMapView() {
+      const cityKey = document.getElementById('map-city-filter').value;
+      if (cityKey !== 'all' && CITY_CENTER_MAP[cityKey]) {
+        map.flyTo(CITY_CENTER_MAP[cityKey], 12, { duration: 1.2 });
+      } else if (displayedDestinations && displayedDestinations.length > 0) {
+        fitMapBounds(displayedDestinations);
+      } else {
+        map.flyTo([16.0544, 108.2022], 12, { duration: 1.2 });
+      }
+    }
+
+    // TẢI TẤT CẢ DỮ LIỆU ĐỊA ĐIỂM TỪ MYSQL
+    async function loadMapDestinations() {
+      try {
+        let res = await fetch(`${API_BASE}/destinations?limit=500`);
+        if (!res.ok) res = await fetch(`${API_BASE}/destinations/featured?limit=100`);
+        
+        if (res.ok) {
+          const data = await res.json();
+          allDestinations = Array.isArray(data) ? data : (data.items || []);
+          
+          // Áp dụng bộ lọc mặc định (Đà Nẵng)
+          applyMapFilters();
+        }
+      } catch (err) {
+        console.error("Lỗi nạp bản đồ:", err);
+      }
+    }
+
+    // BỘ LỌC TỔNG HỢP: TỈNH THÀNH + TỪ KHÓA + DANH MỤC
+    function applyMapFilters() {
+      const cityVal = document.getElementById('map-city-filter').value;
+      const searchKeyword = document.getElementById('map-search-input').value.toLowerCase().trim();
+
+      displayedDestinations = allDestinations.filter(d => {
+        // 1. Lọc theo Thành phố
+        if (cityVal !== 'all') {
+          const dCity = (d.city || '').toLowerCase();
+          const targetCity = cityVal.toLowerCase();
+          if (!dCity.includes(targetCity)) return false;
+        }
+
+        // 2. Lọc theo Danh mục
+        if (currentSelectedCategory !== 'all') {
+          const text = `${d.name || ''} ${d.category || ''} ${d.description || ''}`.toLowerCase();
+          if (!text.includes(currentSelectedCategory)) return false;
+        }
+
+        // 3. Lọc theo từ khóa tìm kiếm
+        if (searchKeyword) {
+          const fullText = `${d.name || ''} ${d.city || ''} ${d.district || ''} ${d.description || ''}`.toLowerCase();
+          if (!fullText.includes(searchKeyword)) return false;
+        }
+
+        return true;
+      });
+
+      // Cập nhật nhãn thống kê
+      const totalBadge = document.getElementById('total-count-badge');
+      const drawerBadge = document.getElementById('drawer-count-badge');
+      const regionLabel = document.getElementById('drawer-region-label');
+
+      if (totalBadge) totalBadge.innerText = displayedDestinations.length;
+      if (drawerBadge) drawerBadge.innerText = `${displayedDestinations.length} điểm`;
+      if (regionLabel) {
+        regionLabel.innerHTML = `
+          <span class="material-symbols-outlined text-[13px] text-emerald-700">location_on</span>
+          ${cityVal === 'all' ? 'Toàn Việt Nam' : cityVal}
+        `;
+      }
+
+      // Vẽ Marker và Drawer List
+      renderMarkers(displayedDestinations);
+      renderDrawerList(displayedDestinations);
+
+      // Di chuyển góc nhìn camera
+      if (cityVal !== 'all' && CITY_CENTER_MAP[cityVal]) {
+        map.flyTo(CITY_CENTER_MAP[cityVal], 12, { duration: 1.0 });
+      } else {
+        fitMapBounds(displayedDestinations);
+      }
+    }
+
+    function onCityFilterChanged() {
+      applyMapFilters();
+    }
+
+    function searchOnMap() {
+      applyMapFilters();
+    }
+
+    function filterCategory(catKey, btn) {
+      currentSelectedCategory = catKey;
+      document.querySelectorAll('.cat-chip-btn').forEach(b => {
+        b.classList.remove('bg-emerald-800', 'text-white', 'shadow-sm', 'active');
+        b.classList.add('bg-slate-100', 'text-slate-700');
+      });
+      btn.classList.add('bg-emerald-800', 'text-white', 'shadow-sm', 'active');
+      btn.classList.remove('bg-slate-100', 'text-slate-700');
+
+      applyMapFilters();
+    }
+
+    // TÍNH TOÁN BÙ TRỪ KHOẢNG TRỐNG DRAWER ĐỂ CĂN GIỮA CAMERA
+    function fitMapBounds(destList) {
+      if (!destList || destList.length === 0 || !map) return;
+      
+      const validPoints = [];
+      destList.forEach(d => {
+        let lat = parseFloat(d.latitude);
+        let lon = parseFloat(d.longitude);
+
+        if (lat > 50 && lon < 50) {
+          const temp = lat; lat = lon; lon = temp;
+        }
+
+        if (!isNaN(lat) && !isNaN(lon) && lat > 0 && lon > 0) {
+          validPoints.push([lat, lon]);
+        }
+      });
+
+      if (validPoints.length > 0) {
+        map.invalidateSize();
+        const isDrawerVisible = document.getElementById('destination-drawer') && 
+          document.getElementById('destination-drawer').style.transform !== 'translateX(-120%)';
+        const paddingLeft = isDrawerVisible ? 400 : 50;
+
+        map.fitBounds(validPoints, {
+          paddingTopLeft: [paddingLeft, 40],
+          paddingBottomRight: [50, 50],
+          maxZoom: 13
+        });
+      }
+    }
+
+    // RENDER MARKERS: CÓ THUẬT TOÁN TÁCH TỌA ĐỘ TRÙNG & GOM CỤM
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+    }
+
+    function renderMarkers(destList) {
+      if (!markersLayer) return;
+      markersLayer.clearLayers();
+
+      const coordCounts = {};
+
+      destList.forEach((item, idx) => {
+        let lat = parseFloat(item.latitude);
+        let lon = parseFloat(item.longitude);
+
+        if (lat > 50 && lon < 50) {
+          const temp = lat; lat = lon; lon = temp;
+        }
+
+        if (isNaN(lat) || isNaN(lon) || lat === 0 || lon === 0) return;
+
+        // Phân tách nhẹ các địa điểm trùng hoàn toàn tọa độ
+        const coordKey = `${lat.toFixed(4)}_${lon.toFixed(4)}`;
+        if (coordCounts[coordKey]) {
+          const angle = coordCounts[coordKey] * 0.9;
+          const radius = coordCounts[coordKey] * 0.00035;
+          lat += Math.sin(angle) * radius;
+          lon += Math.cos(angle) * radius;
+          coordCounts[coordKey]++;
+        } else {
+          coordCounts[coordKey] = 1;
+        }
+
+        const matchPercent = Math.min(99, Math.max(88, Math.round(98 - (idx % 8) * 1.5)));
+        
+        const customPin = L.divIcon({
+          className: 'custom-radar-pin',
+          html: `
+            <div class="pin-core">
+              <span class="material-symbols-outlined text-[16px]">location_on</span>
+            </div>
+            <span class="pin-badge">${matchPercent}%</span>
+          `,
+          iconSize: [32, 32],
+          iconAnchor: [16, 16]
+        });
+
+        const marker = L.marker([lat, lon], { icon: customPin });
+        const img = resolveImage(item, idx);
+        const safeName = escapeHtml(item.name);
+        const safeCity = escapeHtml(item.city || 'Việt Nam');
+        const ratingVal = (Number(item.rating) || 5.0).toFixed(1);
+
+        // GẮN SẴN POPUP TẠI ĐÂY (KHÔNG ĐỢI SỰ KIỆN CLICK MỚI GẮN)
+        marker.bindPopup(`
+          <div style="font-family: 'Plus Jakarta Sans', sans-serif; width: 220px; padding: 2px;">
+            <div style="position: relative; height: 105px; border-radius: 12px; overflow: hidden; margin-bottom: 8px;">
+              <img src="${img}" style="width: 100%; height: 100%; object-fit: cover;" loading="lazy" alt="${safeName}">
+              <span style="position: absolute; top: 6px; left: 6px; background: rgba(6,78,59,0.9); color: #6ffbbe; font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 9999px;">
+                AI Match ${matchPercent}%
+              </span>
+            </div>
+            <h6 style="margin: 0 0 4px 0; font-weight: 800; font-size: 13px; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+              ${safeName}
+            </h6>
+            <p style="margin: 0 0 8px 0; font-size: 11px; color: #047857; font-weight: 700;">
+              ★ ${ratingVal} • ${safeCity}
+            </p>
+            <button onclick="openModalById(${item.id})" style="width: 100%; background: #064e3b; color: white; border: none; padding: 7px; border-radius: 10px; font-size: 11px; font-weight: 800; cursor: pointer; transition: background 0.2s;" onmouseover="this.style.background='#047857'" onmouseout="this.style.background='#064e3b'">
+              Xem chi tiết điểm đến
+            </button>
+          </div>
+        `, {
+          offset: [0, -10],
+          closeButton: true
+        });
+
+        markersLayer.addLayer(marker);
+      });
+    }
+
+    // RENDER CARD TRONG DRAWER BÊN TRÁI (GIỮ NGUYÊN 100% GIAO DIỆN CHUẨN)
+    function renderDrawerList(list) {
+      const container = document.getElementById('drawer-card-list');
+      if (!container) return;
+      container.innerHTML = '';
+
+      if (!list || list.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-10 text-slate-400">
+            <span class="material-symbols-outlined text-[32px] mb-1">location_off</span>
+            <p class="text-xs font-bold">Không tìm thấy địa điểm nào</p>
+          </div>
+        `;
+        return;
+      }
+
+      let favs = [];
+      try {
+        favs = getFavorites();
+      } catch (e) {
+        favs = [];
+      }
+
+      list.forEach((item, idx) => {
+        try {
+          const isFav = Array.isArray(favs) && favs.includes(item.id);
+          const img = resolveImage(item, idx);
+          const matchPercent = Math.min(99, Math.max(88, Math.round(98 - (idx % 8) * 1.5)));
+
+          const costVal = Number(item.estimated_cost) || 0;
+          let costStr = "Miễn phí";
+          if (costVal > 0) {
+            costStr = `${costVal.toLocaleString('vi-VN')} đ`;
+          } else if (item.price && typeof item.price === 'string' && !item.price.toLowerCase().includes('free')) {
+            costStr = item.price;
+          }
+
+          const article = document.createElement('article');
+          article.className = "p-2.5 rounded-xl bg-white hover:bg-slate-50 transition-all flex flex-col gap-2 group cursor-pointer shadow-sm border border-slate-200/70";
+          article.onclick = () => focusDestination(item);
+
+          article.innerHTML = `
+            <div class="flex gap-2.5">
+              <div class="w-20 h-20 rounded-lg overflow-hidden shrink-0 relative">
+                <img src="${img}" class="w-full h-full object-cover group-hover:scale-105 transition-transform" alt="${item.name}">
+                <span class="absolute top-1 left-1 px-1.5 py-0.5 rounded bg-emerald-900/90 text-emerald-300 text-[9px] font-extrabold">
+                  ${matchPercent}%
+                </span>
+              </div>
+
+              <div class="flex flex-col flex-1 justify-between min-w-0">
+                <div>
+                  <div class="flex items-center justify-between gap-1">
+                    <h3 class="font-extrabold text-xs text-slate-900 truncate group-hover:text-emerald-800 transition mb-0">${item.name}</h3>
+                    <button onclick="toggleFavorite(${item.id}, this, event)" class="${isFav ? 'text-red-500' : 'text-slate-400'} hover:scale-110 transition border-0 bg-transparent p-0">
+                      <span class="material-symbols-outlined text-[17px]" ${isFav ? 'style="font-variation-settings: \'FILL\' 1;"' : ''}>favorite</span>
+                    </button>
+                  </div>
+                  <div class="flex items-center gap-1.5 text-slate-500 text-[11px] mt-0.5 font-semibold">
+                    <span class="text-amber-500 font-bold">★ ${(Number(item.rating) || 5.0).toFixed(1)}</span>
+                    <span>•</span>
+                    <span class="truncate">${item.city || 'Việt Nam'}</span>
+                  </div>
+                </div>
+
+                <div class="flex items-center gap-1.5 flex-wrap">
+                  <span class="px-2 py-0.5 rounded-full bg-slate-100 text-emerald-800 text-[10px] font-bold">
+                    ${item.category || 'Điểm đến'}
+                  </span>
+                  <span class="text-[11px] font-extrabold text-emerald-700 ml-auto">
+                    ${costStr}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between pt-1 border-t border-slate-100 text-slate-500 text-[11px]">
+              <span class="truncate max-w-[210px] text-[10px]">${item.short_description || item.description || ''}</span>
+              <button onclick="openModalById(${item.id}); event.stopPropagation();" class="px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 font-bold text-[10px] hover:bg-emerald-100 transition border-0">
+                Chi tiết
+              </button>
+            </div>
+          `;
+
+          container.appendChild(article);
+        } catch (e) {}
+      });
+    }
+
+    function focusDestination(item) {
+      const lat = parseFloat(item.latitude);
+      const lon = parseFloat(item.longitude);
+      if (!isNaN(lat) && !isNaN(lon)) {
+        map.flyTo([lat, lon], 15, { duration: 1.0 });
+
+        // Tự động tìm marker tương ứng và mở popup
+        setTimeout(() => {
+          if (markersLayer) {
+            markersLayer.eachLayer(layer => {
+              const pos = layer.getLatLng();
+              if (Math.abs(pos.lat - lat) < 0.005 && Math.abs(pos.lng - lon) < 0.005) {
+                layer.openPopup();
+              }
+            });
+          }
+        }, 1100);
+      }
+    }
+
+    function sortDrawerCards() {
+      isSortAsc = !isSortAsc;
+      displayedDestinations.sort((a, b) => isSortAsc ? (a.rating - b.rating) : (b.rating - a.rating));
+      renderDrawerList(displayedDestinations);
+    }
+
+    function locateUserGPS() {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(pos => {
+          const lat = pos.coords.latitude;
+          const lon = pos.coords.longitude;
+          map.flyTo([lat, lon], 14, { duration: 1.2 });
+
+          const userPin = L.divIcon({
+            className: 'user-pin-pulse',
+            html: `<div style="background:#2563eb; width:20px; height:20px; border-radius:50%; border:3px solid white; box-shadow:0 0 12px rgba(37,99,235,0.8);"></div>`,
+            iconSize: [20, 20]
+          });
+          L.marker([lat, lon], { icon: userPin }).addTo(map).bindPopup("<b>Vị trí hiện tại của bạn</b>").openPopup();
+        });
+      }
+    }
+
+    const drawerToggleBtn = document.getElementById('drawer-toggle-btn');
+    const destinationDrawer = document.getElementById('destination-drawer');
+    if (drawerToggleBtn && destinationDrawer) {
+      let isOpen = true;
+      drawerToggleBtn.addEventListener('click', () => {
+        isOpen = !isOpen;
+        destinationDrawer.style.transform = isOpen ? 'translateX(0)' : 'translateX(-120%)';
+        setTimeout(() => fitMapBounds(displayedDestinations), 300);
+      });
+    }
+
+    // MỞ MODAL CHI TIẾT
+    function openModalById(id) {
+      const item = allDestinations.find(d => d.id === id);
+      if (!item) return;
+
+      if (typeof trackDestinationView === 'function') {
+        trackDestinationView(id);
+      }
+
+      const idx = allDestinations.indexOf(item);
+      document.getElementById('m-image').src = resolveImage(item, idx);
+      document.getElementById('m-badge').innerText = item.category || 'Điểm đến';
+      document.getElementById('m-title').innerText = item.name;
+      document.getElementById('m-description').innerText = item.description || item.short_description || '';
+      
+      const costVal = Number(item.estimated_cost) || 0;
+      const costStr = costVal > 0 ? `${costVal.toLocaleString('vi-VN')} VNĐ` : (item.price || 'Miễn phí');
+      document.getElementById('m-price').innerText = costStr;
+      
+      const ratingEl = document.getElementById('m-rating-badge');
+      if (ratingEl) ratingEl.innerText = `★ ${(Number(item.rating) || 5.0).toFixed(1)}`;
+
+      document.getElementById('m-address').querySelector('span').innerText = `${item.district || 'Trung tâm'}, ${item.city || 'Việt Nam'}`;
+      
+      const lat = parseFloat(item.latitude) || 16.0544;
+      const lon = parseFloat(item.longitude) || 108.2022;
+      document.getElementById('m-coords').innerText = `${lat.toFixed(4)}, ${lon.toFixed(4)}`;
+      document.getElementById('m-map-btn').onclick = () => {
+        window.openGoogleDirectionsModal({
+          destLat: lat,
+          destLon: lon,
+          destName: item.name,
+          destAddress: `${item.district || 'Trung tâm'}, ${item.city || 'Việt Nam'}`
+        });
+      };
+
+      document.getElementById('detail-modal').classList.remove('hidden');
+
+      loadReviewsForDestination(id);
+    }
+
+    function closeModal() {
+      document.getElementById('detail-modal').classList.add('hidden');
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      checkUserSession();
+      initMap();
+      loadMapDestinations();
+      if (typeof syncFavoritesFromDatabase === 'function') {
+        syncFavoritesFromDatabase();
+      }
+    });
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,989 @@
+<!DOCTYPE html>
+<html lang="vi" class="scroll-smooth">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Khám Phá Địa Điểm - Smart Tourism AI</title>
+
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons & Lucide Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Phông chữ Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --emerald-50: #ecfdf5;
+      --emerald-100: #d1fae5;
+      --emerald-600: #059669;
+      --emerald-700: #047857;
+      --emerald-800: #065f46;
+      --emerald-900: #064e3b;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: #f8fafc;
+      color: #1e293b;
+    }
+
+    /* Navbar Glass đồng bộ với index.html */
+    .nav-glass {
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(16px);
+      border-radius: 16px;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .logo-badge {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background-color: var(--emerald-700);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-weight: bold;
+    }
+
+    /* Menu User dropdown khi đã đăng nhập */
+    .user-profile-btn {
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(5, 150, 105, 0.25);
+      border-radius: 9999px;
+      padding: 5px 14px 5px 6px;
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+    .user-profile-btn:hover {
+      background: #ffffff;
+      border-color: var(--emerald-600);
+      transform: translateY(-1px);
+    }
+    .user-avatar-circle {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--emerald-800);
+      color: #ffffff;
+      font-weight: 700;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 5px rgba(4, 120, 87, 0.3);
+    }
+    .user-dropdown-menu {
+      border-radius: 18px;
+      border: 1px solid #f1f5f9;
+      box-shadow: 0 15px 30px -5px rgba(0, 0, 0, 0.1);
+      padding: 8px;
+      min-width: 190px;
+    }
+    .user-dropdown-menu .dropdown-item {
+      border-radius: 10px;
+      padding: 8px 12px;
+      font-weight: 600;
+      font-size: 13px;
+    }
+
+    /* Thẻ Card */
+    .explore-card {
+      background: #ffffff;
+      border-radius: 24px;
+      border: 1px solid #e2e8f0;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .explore-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 30px -5px rgba(0, 0, 0, 0.1);
+      border-color: #cbd5e1;
+    }
+    .explore-card-img {
+      height: 185px;
+      width: 100%;
+      object-fit: cover;
+      transition: transform 0.6s ease;
+    }
+    .explore-card:hover .explore-card-img {
+      transform: scale(1.06);
+    }
+
+    /* Menu link */
+    .nav-link-custom {
+      color: #64748b;
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+    .nav-link-custom:hover {
+      color: var(--emerald-700);
+    }
+    .nav-link-custom.active {
+      color: var(--emerald-700) !important;
+      font-weight: 800;
+    }
+
+    /* Nút tim lưu yêu thích */
+    .btn-favorite-heart {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      z-index: 15;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .btn-favorite-heart:hover {
+      transform: scale(1.15);
+      background: rgba(15, 23, 42, 0.85);
+    }
+    .btn-favorite-heart.favorited {
+      background: #ffffff;
+      color: #ef4444;
+      border-color: #fca5a5;
+    }
+  </style>
+</head>
+
+<body class="min-h-screen flex flex-col justify-between">
+
+  <!-- ==========================================
+       1. THANH ĐIỀU HƯỚNG NAVBAR
+       ========================================== -->
+  <div class="container sticky-top pt-3" style="max-width: 1240px; z-index: 50;">
+    <header class="nav-glass">
+      
+      <!-- LOGO HỆ THỐNG -->
+      <a href="index.html" class="d-flex align-items-center gap-3 text-decoration-none">
+        <div class="logo-badge">
+          <i class="bi bi-stars"></i>
+        </div>
+        <div>
+          <div class="d-flex align-items-center gap-2">
+            <span class="fs-6 fw-bold text-dark tracking-tight">Smart Tourism <span style="color: var(--emerald-700);">AI</span></span>
+            <span class="badge" style="font-size: 9px; background-color: var(--emerald-100); color: var(--emerald-800); font-weight: 700;">TÍCH HỢP AI</span>
+          </div>
+          <span class="small text-muted fw-semibold d-block" style="font-size: 11px;">Du lịch thông minh Việt Nam</span>
+        </div>
+      </a>
+
+      <!-- MENU ĐIỀU HƯỚNG CHÍNH -->
+      <nav id="main-nav-links" class="d-none d-lg-flex align-items-center gap-4 fw-bold small">
+        <a href="index.html" class="nav-link-custom" data-page="index.html">Trang Chủ</a>
+        <a href="explore.html" class="nav-link-custom active" data-page="explore.html">Khám Phá</a>
+        <a href="map.html" class="nav-link-custom" data-page="map.html">Bản đồ</a>
+        <a href="favorites.html" class="nav-link-custom" data-page="favorites.html">Yêu thích</a>
+        <a href="trip-planner.html" class="nav-link-custom" data-page="trip-planner.html">Lập Lịch Trình</a>
+      </nav>
+
+      <!-- NÚT TÌM KIẾM & KHU VỰC TÀI KHOẢN -->
+      <div class="d-flex align-items-center gap-2">
+        <a href="search.html" class="btn btn-sm btn-light rounded-circle text-secondary p-2 d-flex align-items-center justify-content-center shadow-sm" style="width: 38px; height: 38px;" title="Tìm kiếm điểm đến">
+          <i class="bi bi-search"></i>
+        </a>
+
+        <div id="nav-user-area">
+          <a href="signin.html" id="nav-login-btn" class="btn btn-sm rounded-pill px-4 text-white fw-bold d-flex align-items-center gap-2" style="background-color: var(--emerald-800);">
+            <span>Đăng Nhập</span>
+            <i class="bi bi-arrow-right"></i>
+          </a>
+        </div>
+      </div>
+
+    </header>
+  </div>
+
+  <!-- ==========================================
+       2. NỘI DUNG CHÍNH (MAIN EXPLORE)
+       ========================================== -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-16 flex-1 w-full">
+
+    <!-- TIÊU ĐỀ TRANG -->
+    <div class="mb-8">
+      <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-100/80 text-emerald-800 text-xs font-extrabold tracking-wide mb-3 border border-emerald-200">
+        <i data-lucide="compass" class="w-3.5 h-3.5 text-emerald-600"></i>
+        KHÁM PHÁ TOÀN DIỆN VIỆT NAM
+      </div>
+      <h1 class="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight mb-2">
+        Tất Cả Điểm Đến Du Lịch
+      </h1>
+      <p class="text-slate-600 text-sm font-medium">
+        Khám phá kho dữ liệu danh lam thắng cảnh, di tích và ẩm thực phong phú khắp 34 tỉnh thành Việt Nam.
+      </p>
+    </div>
+
+    <!-- BỐ CỤC 2 CỘT: BỘ LỌC + DANH SÁCH LƯỚI -->
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+
+      <!-- THANH BỘ LỌC BÊN TRÁI -->
+      <aside class="lg:col-span-1 space-y-6">
+        <div class="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm space-y-6 sticky top-24">
+          
+          <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+            <div class="flex items-center gap-2 font-black text-slate-900 text-base">
+              <i data-lucide="sliders-horizontal" class="w-5 h-5 text-emerald-600"></i>
+              <span>Bộ Lọc Điểm Đến</span>
+            </div>
+            <button onclick="resetFilters()" class="text-xs font-bold text-emerald-600 hover:text-emerald-700 hover:underline">
+              Xóa lọc
+            </button>
+          </div>
+
+          <!-- 1. TỈNH THÀNH  -->
+          <div class="space-y-3">
+            <label class="block text-xs font-extrabold text-slate-800 uppercase tracking-wider">
+              <i data-lucide="map-pin" class="w-3.5 h-3.5 inline text-emerald-600 mr-1"></i> Tỉnh / Thành Phố
+            </label>
+            <select id="filter-city" onchange="applyFilters()"
+              class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-xs font-bold text-slate-700 focus:outline-none focus:border-emerald-500">
+              <option value="all">Tất cả tỉnh thành</option>
+              <option value="Đà Nẵng">Đà Nẵng</option>
+              <option value="Hà Nội">Hà Nội</option>
+              <option value="Quảng Nam">Quảng Nam (Hội An)</option>
+              <option value="Lâm Đồng">Lâm Đồng (Đà Lạt)</option>
+              <option value="Khánh Hòa">Khánh Hòa (Nha Trang)</option>
+              <option value="Quảng Ninh">Quảng Ninh (Hạ Long)</option>
+              <option value="Kiên Giang">Kiên Giang (Phú Quốc)</option>
+              <option value="Lào Cai">Lào Cai (Sa Pa)</option>
+              <option value="Ninh Bình">Ninh Bình</option>
+              <option value="Thừa Thiên Huế">Huế</option>
+            </select>
+          </div>
+
+          <!-- 2. PHÂN LOẠI TRẢI NGHIỆM -->
+          <div class="space-y-3 border-t border-slate-100 pt-4">
+            <label class="block text-xs font-extrabold text-slate-800 uppercase tracking-wider">
+              <i data-lucide="grid" class="w-3.5 h-3.5 inline text-emerald-600 mr-1"></i> Loại Hình
+            </label>
+            <div class="space-y-2 text-xs font-semibold text-slate-600" id="filter-category">
+              <label class="flex items-center gap-2.5 cursor-pointer hover:text-slate-900">
+                <input type="checkbox" value="biển" onchange="applyFilters()" class="w-4 h-4 rounded text-emerald-600 accent-emerald-600">
+                <span> Biển đảo & Nghỉ dưỡng</span>
+              </label>
+              <label class="flex items-center gap-2.5 cursor-pointer hover:text-slate-900">
+                <input type="checkbox" value="thiên nhiên" onchange="applyFilters()" class="w-4 h-4 rounded text-emerald-600 accent-emerald-600">
+                <span> Thiên nhiên & Sinh thái</span>
+              </label>
+              <label class="flex items-center gap-2.5 cursor-pointer hover:text-slate-900">
+                <input type="checkbox" value="văn hóa" onchange="applyFilters()" class="w-4 h-4 rounded text-emerald-600 accent-emerald-600">
+                <span> Di tích & Văn hóa</span>
+              </label>
+              <label class="flex items-center gap-2.5 cursor-pointer hover:text-slate-900">
+                <input type="checkbox" value="ẩm thực" onchange="applyFilters()" class="w-4 h-4 rounded text-emerald-600 accent-emerald-600">
+                <span> Ẩm thực & Chợ đêm</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- 3. MỨC GIÁ -->
+          <div class="space-y-3 border-t border-slate-100 pt-4">
+            <label class="block text-xs font-extrabold text-slate-800 uppercase tracking-wider">
+              <i data-lucide="tag" class="w-3.5 h-3.5 inline text-emerald-600 mr-1"></i> Giá Vé / Chi Phí
+            </label>
+            <div class="space-y-2 text-xs font-semibold text-slate-600" id="filter-price">
+              <label class="flex items-center gap-2.5 cursor-pointer hover:text-slate-900">
+                <input type="radio" name="price" value="all" checked onchange="applyFilters()" class="accent-emerald-600">
+                <span>Tất cả mức giá</span>
+              </label>
+              <label class="flex items-center gap-2.5 cursor-pointer hover:text-slate-900">
+                <input type="radio" name="price" value="free" onchange="applyFilters()" class="accent-emerald-600">
+                <span>Miễn phí vé vào</span>
+              </label>
+              <label class="flex items-center gap-2.5 cursor-pointer hover:text-slate-900">
+                <input type="radio" name="price" value="under200" onchange="applyFilters()" class="accent-emerald-600">
+                <span>&lt; 200.000 VNĐ</span>
+              </label>
+              <label class="flex items-center gap-2.5 cursor-pointer hover:text-slate-900">
+                <input type="radio" name="price" value="over200" onchange="applyFilters()" class="accent-emerald-600">
+                <span>&ge; 200.000 VNĐ</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- 4. ĐÁNH GIÁ (RATING) -->
+          <div class="space-y-3 border-t border-slate-100 pt-4">
+            <label class="block text-xs font-extrabold text-slate-800 uppercase tracking-wider">
+              <i data-lucide="star" class="w-3.5 h-3.5 inline text-amber-500 mr-1"></i> Đánh Giá Sao
+            </label>
+            <div class="space-y-2 text-xs font-semibold text-slate-600" id="filter-rating">
+              <label class="flex items-center gap-2.5 cursor-pointer hover:text-slate-900">
+                <input type="radio" name="rating" value="all" checked onchange="applyFilters()" class="accent-emerald-600">
+                <span>Tất cả đánh giá</span>
+              </label>
+              <label class="flex items-center gap-2.5 cursor-pointer hover:text-slate-900">
+                <input type="radio" name="rating" value="4.5" onchange="applyFilters()" class="accent-emerald-600">
+                <span>⭐ Từ 4.5 sao trở lên</span>
+              </label>
+              <label class="flex items-center gap-2.5 cursor-pointer hover:text-slate-900">
+                <input type="radio" name="rating" value="4.0" onchange="applyFilters()" class="accent-emerald-600">
+                <span>⭐ Từ 4.0 sao trở lên</span>
+              </label>
+            </div>
+          </div>
+
+        </div>
+      </aside>
+
+      <!-- KHU VỰC HIỂN THỊ KẾT QUẢ BÊN PHẢI -->
+      <section class="lg:col-span-3 space-y-6">
+
+        <!-- THANH TÌM KIẾM VÀ SẮP XẾP -->
+        <div class="bg-white p-4 rounded-3xl border border-slate-200 shadow-sm flex flex-col sm:flex-row gap-4 items-center justify-between">
+          <div class="relative w-full sm:w-96">
+            <i data-lucide="search" class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"></i>
+            <input type="text" id="search-input" oninput="applyFilters()"
+              placeholder="Tìm kiếm địa điểm, di tích, bãi biển..."
+              class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs font-bold text-slate-700 placeholder-slate-400 focus:outline-none focus:border-emerald-500 focus:bg-white transition">
+          </div>
+
+          <div class="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
+            <span id="result-count" class="text-xs font-extrabold text-slate-500">Đang tải dữ liệu...</span>
+            <select id="sort-select" onchange="applyFilters()" class="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-slate-700 focus:outline-none">
+              <option value="rating">Đánh giá cao nhất</option>
+              <option value="name">Tên A-Z</option>
+              <option value="price-asc">Giá: Thấp đến Cao</option>
+              <option value="price-desc">Giá: Cao đến Thấp</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- LƯỚI CARD ĐỊA ĐIỂM -->
+        <div id="explore-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div class="col-span-full text-center py-12 text-slate-400">
+            <div class="spinner-border text-success spinner-border-sm mb-2" role="status"></div>
+            <p class="text-xs">Đang tải danh sách điểm đến từ máy chủ...</p>
+          </div>
+        </div>
+
+        <!-- THÔNG BÁO KHÔNG TÌM THẤY -->
+        <div id="no-results" class="hidden text-center py-16 bg-white rounded-3xl border border-slate-200 shadow-sm">
+          <i data-lucide="map-pin-off" class="w-12 h-12 text-slate-300 mx-auto mb-3"></i>
+          <p class="text-slate-800 font-bold text-base mb-1">Không tìm thấy địa điểm nào phù hợp</p>
+          <p class="text-slate-500 text-xs">Hãy thử đổi từ khóa tìm kiếm hoặc bấm "Xóa lọc" ở thanh bên trái.</p>
+        </div>
+
+      </section>
+
+    </div>
+  </main>
+
+  <!-- ==========================================
+       3. POPUP MODAL CHI TIẾT (ĐÃ CHUẨN HÓA CẤU TRÚC)
+       ========================================== -->
+  <div id="detail-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm">
+    <div class="bg-white border border-slate-100 rounded-3xl max-w-lg w-full overflow-hidden shadow-2xl max-h-[90vh] flex flex-col relative text-slate-800">
+      
+      <button onclick="closeModal()" class="absolute top-4 right-4 z-20 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full backdrop-blur-md transition">
+        <i data-lucide="x" class="w-4 h-4"></i>
+      </button>
+
+      <div class="relative h-56 w-full bg-slate-200 shrink-0">
+        <img id="m-image" src="" class="w-full h-full object-cover">
+        <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent"></div>
+        <div class="absolute bottom-4 left-5 right-5 flex justify-between items-end">
+          <div>
+            <span id="m-badge" class="bg-emerald-700 text-white text-[10px] font-extrabold px-2.5 py-1 rounded-full mb-1 inline-block">
+              Danh mục
+            </span>
+            <h2 id="m-title" class="text-xl font-black text-white leading-tight"></h2>
+          </div>
+          <span id="m-rating-badge" class="bg-amber-400 text-slate-900 text-xs font-black px-2.5 py-1 rounded-full shrink-0">
+            ★ 5.0
+          </span>
+        </div>
+      </div>
+
+      <!-- Thân Modal cuộn (Scrollable Body) -->
+      <div class="p-6 overflow-y-auto space-y-4 text-xs font-medium text-slate-600">
+        <div>
+          <span class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider block mb-1">Địa chỉ</span>
+          <p id="m-address" class="text-slate-800 font-bold flex items-center gap-1">
+            <i data-lucide="map-pin" class="w-3.5 h-3.5 text-emerald-600"></i>
+            <span></span>
+          </p>
+        </div>
+
+        <div>
+          <span class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider block mb-1">Mô tả chi tiết</span>
+          <p id="m-description" class="leading-relaxed"></p>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3 pt-1">
+          <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200">
+            <span class="text-[10px] font-extrabold text-slate-400 uppercase block mb-0.5">Chi phí tham khảo</span>
+            <span id="m-price" class="text-xs font-extrabold text-emerald-700"></span>
+          </div>
+          <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200">
+            <span class="text-[10px] font-extrabold text-slate-400 uppercase block mb-0.5">Tọa độ vệ tinh</span>
+            <span id="m-coords" class="text-xs font-bold text-slate-700"></span>
+          </div>
+        </div>
+
+        <!-- KHỐI ĐÁNH GIÁ THỰC TẾ TỪ CƠ SỞ DỮ LIỆU -->
+        <div class="mt-4 pt-3 border-t border-slate-200">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-[11px] font-extrabold uppercase text-slate-500">Đánh giá từ cộng đồng</span>
+            <span id="m-review-badge" class="text-xs font-bold text-amber-600">0 lượt nhận xét</span>
+          </div>
+
+          <!-- Form đánh giá: Chọn sao & Bình luận -->
+          <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200/80 mb-3">
+            <div class="text-[11px] font-bold text-slate-700 mb-1.5 flex items-center justify-between">
+              <span>Đánh giá của bạn:</span>
+              <div id="star-picker" class="flex gap-1 text-base text-slate-300 cursor-pointer select-none">
+                <span onclick="setRating(1)" class="star-item text-amber-500">★</span>
+                <span onclick="setRating(2)" class="star-item text-amber-500">★</span>
+                <span onclick="setRating(3)" class="star-item text-amber-500">★</span>
+                <span onclick="setRating(4)" class="star-item text-amber-500">★</span>
+                <span onclick="setRating(5)" class="star-item text-amber-500">★</span>
+              </div>
+            </div>
+            
+            <div class="flex gap-2 mt-2">
+              <input type="text" id="review-comment-input" placeholder="Chia sẻ trải nghiệm của bạn tại đây..." 
+                class="flex-1 bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-xs font-semibold text-slate-700 focus:outline-none focus:border-emerald-600">
+              <button onclick="submitRealReview()" class="px-3.5 py-1.5 rounded-xl bg-emerald-800 hover:bg-emerald-900 text-white text-xs font-bold transition">
+                Gửi
+              </button>
+            </div>
+          </div>
+
+          <!-- Danh sách nhận xét lấy từ bảng reviews -->
+          <div id="reviews-list-container" class="space-y-2 max-h-36 overflow-y-auto pr-1">
+            <p class="text-slate-400 text-[11px] italic">Chưa có đánh giá nào. Hãy là người đầu tiên trải nghiệm!</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chân Modal -->
+      <div class="p-4 bg-slate-50 border-t border-slate-200 flex gap-3 shrink-0">
+        <button type="button" id="m-map-btn" class="flex-1 bg-emerald-700 hover:bg-emerald-800 text-white font-bold py-3 rounded-xl text-center text-xs flex items-center justify-center gap-2 transition border-0 cursor-pointer">
+          <i data-lucide="navigation" class="w-4 h-4"></i> Chỉ đường Maps
+        </button>
+        <button onclick="closeModal()" class="px-5 py-3 rounded-xl border border-slate-200 text-xs font-bold hover:bg-slate-100 transition">
+          Đóng
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="bg-dark text-white-50 py-4 mt-12 border-top border-secondary">
+    <div class="container text-center" style="max-width: 1240px;">
+      <p class="small text-secondary mb-0">&copy; 2026 Dự án Du Lịch Thông Minh Smart Tourism AI. Bản quyền thuộc về tác giả.</p>
+    </div>
+  </footer>
+
+  <!-- Bootstrap 5 JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script src="assets/js/sync-ai.js"></script>
+  <script src="assets/js/google-maps-directions.js"></script>
+  <script>
+    const API_BASE = "http://127.0.0.1:8000/api";
+    let rawDestinations = [];
+    let selectedRatingStars = 5;
+    let currentActiveDestId = null;
+
+    const localGallery = [
+      'assets/images/anh1.jpg',
+      'assets/images/anh2.jpg',
+      'assets/images/ba na hill, da nang.jpg',
+      'assets/images/da lat.jpg',
+      'assets/images/dong son doong.jpg',
+      'assets/images/ho hoan kiem, ha noi.jpg',
+      'assets/images/hoian.jpg',
+      'assets/images/nha trang.jpg'
+    ];
+
+    function resolveImage(item, index) {
+      if (item.featured_image && typeof item.featured_image === 'string' && item.featured_image.trim() !== '') {
+        const img = item.featured_image.trim();
+        if (img.startsWith('http://') || img.startsWith('https://') || img.startsWith('assets/')) {
+          return img;
+        }
+      }
+      return localGallery[index % localGallery.length];
+    }
+
+    // 1. Hàm chọn số sao
+    function setRating(stars) {
+      selectedRatingStars = stars;
+      const starEls = document.querySelectorAll('#star-picker .star-item');
+      starEls.forEach((el, idx) => {
+        if (idx < stars) {
+          el.classList.add('text-amber-500');
+          el.classList.remove('text-slate-300');
+        } else {
+          el.classList.remove('text-amber-500');
+          el.classList.add('text-slate-300');
+        }
+      });
+    }
+
+    // 2. Nạp danh sách đánh giá từ bảng reviews khi mở Modal
+    async function loadReviewsForDestination(destId) {
+      currentActiveDestId = destId;
+      setRating(5);
+      const inputEl = document.getElementById('review-comment-input');
+      if (inputEl) inputEl.value = '';
+
+      const listContainer = document.getElementById('reviews-list-container');
+      if (!listContainer) return;
+      listContainer.innerHTML = `<p class="text-slate-400 text-[11px]">Đang nạp đánh giá...</p>`;
+
+      try {
+        const res = await fetch(`${API_BASE}/destinations/${destId}/reviews`);
+        if (res.ok) {
+          const reviews = await res.json();
+          const badge = document.getElementById('m-review-badge');
+          if (badge) badge.innerText = `${reviews.length} nhận xét`;
+
+          if (reviews.length === 0) {
+            listContainer.innerHTML = `<p class="text-slate-400 text-[11px] italic">Chưa có đánh giá nào cho điểm đến này. Hãy là người đầu tiên!</p>`;
+            return;
+          }
+
+          listContainer.innerHTML = reviews.map(r => `
+            <div class="bg-white p-2.5 rounded-xl border border-slate-100 text-[11px] shadow-sm">
+              <div class="flex items-center justify-between mb-0.5">
+                <span class="font-bold text-slate-800">${r.user_name}</span>
+                <span class="text-amber-500 font-bold">${'★'.repeat(r.rating)}</span>
+              </div>
+              <p class="text-slate-600 mb-0.5">${r.comment}</p>
+              <span class="text-slate-400 text-[9px]">${r.created_at}</span>
+            </div>
+          `).join('');
+        }
+      } catch (e) {
+        listContainer.innerHTML = `<p class="text-slate-400 text-[11px]">Không thể tải đánh giá từ máy chủ.</p>`;
+      }
+    }
+
+    // 3. Gửi đánh giá thực tế lên Backend
+    async function submitRealReview() {
+      if (!currentActiveDestId) return;
+
+      const commentVal = document.getElementById('review-comment-input').value.trim();
+      const userStr = localStorage.getItem('user');
+      const user = userStr ? JSON.parse(userStr) : null;
+      const userId = user ? user.id : 1;
+
+      try {
+        const res = await fetch(`${API_BASE}/destinations/review`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            destination_id: currentActiveDestId,
+            user_id: userId,
+            rating: selectedRatingStars,
+            comment: commentVal
+          })
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          const ratingBadge = document.getElementById('m-rating-badge');
+          if (ratingBadge) {
+            ratingBadge.innerText = `★ ${Number(data.new_rating).toFixed(1)}`;
+          }
+
+          alert(`Cảm ơn bạn! Hệ thống đã ghi nhận đánh giá ${selectedRatingStars} sao.`);
+          loadReviewsForDestination(currentActiveDestId);
+        } else {
+          alert('Không thể gửi đánh giá, vui lòng kiểm tra lại!');
+        }
+      } catch (err) {
+        alert('Lỗi kết nối tới máy chủ!');
+      }
+    }
+
+    // 4. Kiểm tra trạng thái đăng nhập
+    function checkUserSession() {
+      const userStr = localStorage.getItem('user');
+      const userArea = document.getElementById('nav-user-area');
+      if (!userArea) return;
+
+      if (userStr) {
+        try {
+          const user = JSON.parse(userStr);
+          const displayName = user.full_name || user.name || (user.email ? user.email.split('@')[0] : 'Người dùng');
+          const firstChar = displayName.charAt(0).toUpperCase();
+
+          userArea.innerHTML = `
+            <div class="dropdown">
+              <div class="user-profile-btn" data-bs-toggle="dropdown" aria-expanded="false">
+                <div class="user-avatar-circle">${firstChar}</div>
+                <div class="text-start d-none d-sm-block">
+                  <span class="d-block text-dark fw-bold" style="font-size: 12px; line-height: 1.2;">${displayName}</span>
+                  <span class="d-block text-muted" style="font-size: 10px;">Thành viên</span>
+                </div>
+                <i class="bi bi-chevron-down text-muted" style="font-size: 11px;"></i>
+              </div>
+
+              <ul class="dropdown-menu dropdown-menu-end user-dropdown-menu mt-2">
+                <li class="px-3 py-2 border-bottom mb-1">
+                  <span class="d-block small text-muted" style="font-size: 11px;">Đã đăng nhập bằng</span>
+                  <span class="d-block small fw-bold text-dark text-truncate" style="max-width: 170px;">${user.email || ''}</span>
+                </li>
+                <li>
+                  <button class="dropdown-item text-danger" onclick="logout()">
+                    <i class="bi bi-box-arrow-right me-2"></i>Đăng xuất
+                  </button>
+                </li>
+              </ul>
+            </div>
+          `;
+        } catch (e) {}
+      }
+    }
+
+    function logout() {
+      localStorage.removeItem('user');
+      localStorage.removeItem('token');
+      window.location.reload();
+    }
+
+    // 5. Tải dữ liệu Explore
+    // Hàm chuẩn hóa chuỗi tiếng Việt (xóa dấu) để tìm kiếm chính xác
+    function removeVietnameseTones(str) {
+      if (!str) return '';
+      str = str.toLowerCase();
+      str = str.replace(/à|á|ạ|ả|ã|â|ầ|ấ|ậ|ẩ|ẫ|ă|ằ|ắ|ặ|ẳ|ẵ/g, "a");
+      str = str.replace(/è|é|ẹ|ẻ|ẽ|ê|ề|ế|ệ|ể|ễ/g, "e");
+      str = str.replace(/ì|í|ị|ỉ|ĩ/g, "i");
+      str = str.replace(/ò|ó|ọ|ỏ|õ|ô|ồ|ố|ộ|ổ|ỗ|ơ|ờ|ớ|ợ|ở|ỡ/g, "o");
+      str = str.replace(/ù|ú|ụ|ủ|ũ|ư|ừ|ứ|ự|ử|ữ/g, "u");
+      str = str.replace(/ỳ|ý|ỵ|ỷ|ỹ/g, "y");
+      str = str.replace(/đ/g, "d");
+      str = str.replace(/\u0300|\u0301|\u0303|\u0309|\u0323/g, ""); // Huyền, sắc, ngã, hỏi, nặng
+      str = str.replace(/\u02C6|\u0306|\u031B/g, ""); // Â, Ă, Ơ, Ư
+      return str.trim();
+    }
+
+    // 5. Tải toàn bộ dữ liệu từ CSDL MySQL không bỏ sót
+    async function loadExploreData() {
+      const grid = document.getElementById('explore-grid');
+      grid.innerHTML = `
+        <div class="col-span-full text-center py-12 text-slate-400">
+          <div class="spinner-border text-success spinner-border-sm mb-2" role="status"></div>
+          <p class="text-xs">Đang tải toàn bộ danh sách điểm đến từ MySQL...</p>
+        </div>
+      `;
+
+      try {
+        // Tăng limit lên 500 để lấy đầy đủ toàn bộ database
+        let res = await fetch(`${API_BASE}/destinations?limit=500`);
+        if (!res.ok) {
+          res = await fetch(`${API_BASE}/destinations/featured?limit=100`);
+        }
+
+        if (res.ok) {
+          const data = await res.json();
+          // Xử lý linh hoạt mọi cấu trúc response trả về từ FastAPI
+          if (Array.isArray(data)) {
+            rawDestinations = data;
+          } else if (data.items && Array.isArray(data.items)) {
+            rawDestinations = data.items;
+          } else if (data.data && Array.isArray(data.data)) {
+            rawDestinations = data.data;
+          } else {
+            rawDestinations = [];
+          }
+
+          console.log(`✓ Đã nạp ${rawDestinations.length} địa điểm từ MySQL vào trang Khám phá.`);
+          applyFilters();
+        } else {
+          showError("Không thể tải danh sách địa điểm từ API.");
+        }
+      } catch (err) {
+        showError("Lỗi kết nối máy chủ FastAPI. Hãy đảm bảo backend đang chạy!");
+      }
+    }
+
+    // 6. Xử lý bộ lọc & Tìm kiếm thông minh (Hỗ trợ cả gõ có dấu lẫn không dấu)
+    function applyFilters() {
+      const searchRaw = document.getElementById('search-input').value.trim();
+      const searchValNoTone = removeVietnameseTones(searchRaw);
+      const searchValLower = searchRaw.toLowerCase();
+
+      const cityVal = document.getElementById('filter-city').value;
+      const sortVal = document.getElementById('sort-select').value;
+
+      const selectedCatEls = document.querySelectorAll('#filter-category input:checked');
+      const selectedCats = Array.from(selectedCatEls).map(el => el.value);
+
+      const priceVal = document.querySelector('#filter-price input:checked')?.value || 'all';
+      const ratingVal = document.querySelector('#filter-rating input:checked')?.value || 'all';
+
+      const categoryKeywordMap = {
+        "biển": ["biển", "bãi biển", "vịnh", "đảo", "bãi", "bán đảo", "nha trang", "phú quốc", "mỹ khê", "hạ long", "quy nhơn", "kỳ co"],
+        "thiên nhiên": ["thiên nhiên", "rừng", "núi", "thác", "vườn quốc gia", "động", "hang", "sapa", "hồ", "đồi"],
+        "văn hóa": ["văn hóa", "di tích", "lịch sử", "chùa", "đền", "bảo tàng", "phố cổ", "lăng", "văn miếu", "hoàng thành", "nhà tù"],
+        "ẩm thực": ["ẩm thực", "ăn uống", "đặc sản", "chợ", "làng nghề", "món"]
+      };
+
+      let filtered = rawDestinations.filter(place => {
+        const name = (place.name || '');
+        const desc = (place.description || place.short_description || '');
+        const city = (place.city || '');
+        const district = (place.district || '');
+        const category = (place.category || '');
+
+        const combinedText = `${name} ${desc} ${city} ${district} ${category}`.toLowerCase();
+        const combinedNoTone = removeVietnameseTones(combinedText);
+
+        // 1. Kiểm tra từ khóa tìm kiếm (so sánh cả nguyên bản và bản không dấu)
+        if (searchRaw) {
+          const matchWithTone = combinedText.includes(searchValLower);
+          const matchWithoutTone = combinedNoTone.includes(searchValNoTone);
+          if (!matchWithTone && !matchWithoutTone) {
+            return false;
+          }
+        }
+
+        // 2. Kiểm tra bộ lọc Tỉnh/Thành phố
+        if (cityVal !== 'all') {
+          const cityNormalized = removeVietnameseTones(cityVal);
+          if (!combinedNoTone.includes(cityNormalized)) {
+            return false;
+          }
+        }
+
+        // 3. Kiểm tra loại hình / chủ đề
+        if (selectedCats.length > 0) {
+          const isCategoryMatched = selectedCats.some(selectedKey => {
+            const keywords = categoryKeywordMap[selectedKey] || [selectedKey];
+            return keywords.some(kw => combinedText.includes(kw));
+          });
+          if (!isCategoryMatched) return false;
+        }
+
+        // 4. Kiểm tra chi phí an toàn
+        const cost = Number(place.estimated_cost) || 0;
+        const isFree = cost === 0 || String(place.price || '').toLowerCase().includes('free') || String(place.price || '').toLowerCase().includes('miễn phí');
+
+        if (priceVal === 'free' && !isFree) return false;
+        if (priceVal === 'under200' && (cost >= 200000 && !isFree)) return false;
+        if (priceVal === 'over200' && cost < 200000) return false;
+
+        // 5. Kiểm tra đánh giá sao
+        const rating = Number(place.rating) || 5.0;
+        if (ratingVal === '4.5' && rating < 4.5) return false;
+        if (ratingVal === '4.0' && rating < 4.0) return false;
+
+        return true;
+      });
+
+      // Sắp xếp
+      if (sortVal === 'rating') {
+        filtered.sort((a, b) => (Number(b.rating) || 5.0) - (Number(a.rating) || 5.0));
+      } else if (sortVal === 'name') {
+        filtered.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+      } else if (sortVal === 'price-asc') {
+        filtered.sort((a, b) => (Number(a.estimated_cost) || 0) - (Number(b.estimated_cost) || 0));
+      } else if (sortVal === 'price-desc') {
+        filtered.sort((a, b) => (Number(b.estimated_cost) || 0) - (Number(a.estimated_cost) || 0));
+      }
+const favs = getFavorites();
+      filtered.sort((a, b) => {
+        const aFav = favs.includes(a.id) ? 1 : 0;
+        const bFav = favs.includes(b.id) ? 1 : 0;
+        if (aFav !== bFav) return bFav - aFav; // Điểm đã tim nhảy lên trước
+
+        if (sortVal === 'rating') {
+          return (Number(b.rating) || 5.0) - (Number(a.rating) || 5.0);
+        } else if (sortVal === 'name') {
+          return (a.name || '').localeCompare(b.name || '');
+        } else if (sortVal === 'price-asc') {
+          return (Number(a.estimated_cost) || 0) - (Number(b.estimated_cost) || 0);
+        } else if (sortVal === 'price-desc') {
+          return (Number(b.estimated_cost) || 0) - (Number(a.estimated_cost) || 0);
+        }
+        return 0;
+      });
+
+      renderExploreGrid(filtered);
+    }
+
+    // 7. Render thẻ Card
+    function renderExploreGrid(list) {
+      const grid = document.getElementById('explore-grid');
+      const noResults = document.getElementById('no-results');
+      const countEl = document.getElementById('result-count');
+
+      grid.innerHTML = '';
+      countEl.innerText = `Hiển thị: ${list.length} địa điểm`;
+
+      if (list.length === 0) {
+        noResults.classList.remove('hidden');
+        return;
+      }
+      noResults.classList.add('hidden');
+
+      list.forEach((item, idx) => {
+        const card = document.createElement('div');
+        card.className = "explore-card shadow-sm";
+        card.onclick = () => openModal(item, idx);
+
+        const imgPath = resolveImage(item, idx);
+        const costVal = Number(item.estimated_cost) || 0;
+        const costStr = costVal > 0 ? `${costVal.toLocaleString('vi-VN')} đ` : (item.price || 'Miễn phí');
+
+        const favs = getFavorites();
+        const isFav = favs.includes(item.id);
+
+        card.innerHTML = `
+          <div>
+            <div class="relative overflow-hidden">
+              <img src="${imgPath}" class="explore-card-img" alt="${item.name}">
+              
+              <span class="absolute top-3 left-3 bg-white/90 backdrop-blur-md text-emerald-800 text-[10px] font-extrabold px-2.5 py-1 rounded-full border border-emerald-200">
+                ${item.city || 'Việt Nam'}
+              </span>
+
+              <!-- NÚT TRÁI TIM YÊU THÍCH -->
+             <button data-dest-id="${item.id}" class="btn-favorite-heart ${isFav ? 'favorited' : ''}" onclick="toggleFavorite(${item.id}, this, event)" title="Lưu điểm đến yêu thích">
+                <i class="bi ${isFav ? 'bi-heart-fill' : 'bi-heart'}"></i>
+              </button>
+            </div>
+
+            <div class="p-4 space-y-1.5">
+              <div class="flex items-center justify-between">
+                <h3 class="text-sm font-black text-slate-900 truncate mb-0">${item.name}</h3>
+                <span class="text-amber-500 text-xs font-black shrink-0">★ ${(item.rating || 5.0).toFixed(1)}</span>
+              </div>
+              <p class="text-xs text-slate-500 font-medium line-clamp-2" style="line-height: 1.4;">
+                ${item.short_description || item.description || 'Điểm đến độc đáo với nhiều trải nghiệm hấp dẫn...'}
+              </p>
+            </div>
+          </div>
+
+          <div class="p-4 pt-0 border-t border-slate-100 mt-2 flex items-center justify-between">
+            <span class="text-xs font-extrabold text-emerald-800">${costStr}</span>
+            <button class="w-7 h-7 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center hover:bg-emerald-600 hover:text-white transition">
+              <i class="bi bi-arrow-up-right font-bold text-xs"></i>
+            </button>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+
+      lucide.createIcons();
+    }
+
+   function openModal(item, idx) {
+      document.getElementById('m-image').src = resolveImage(item, idx);
+      document.getElementById('m-badge').innerText = item.city || 'Việt Nam';
+      document.getElementById('m-title').innerText = item.name;
+      document.getElementById('m-description').innerText = item.description || item.short_description || 'Điểm đến nổi bật của du lịch Việt Nam.';
+      
+      const costVal = Number(item.estimated_cost) || 0;
+let costStr = "Miễn phí";
+if (costVal > 0) {
+  costStr = `${costVal.toLocaleString('vi-VN')} VNĐ`;
+} else if (item.price && typeof item.price === 'string' && !item.price.toLowerCase().includes('free')) {
+  costStr = item.price;
+}
+document.getElementById('m-price').innerText = costStr;
+      document.getElementById('m-price').innerText = costStr;
+      document.getElementById('m-rating-badge').innerText = `★ ${(item.rating || 5.0).toFixed(1)}`;
+      document.getElementById('m-address').querySelector('span').innerText = `${item.district || 'Trung tâm'}, ${item.city || 'Việt Nam'}`;
+      
+      const lat = item.latitude || 16.0544;
+      const lon = item.longitude || 108.2022;
+      document.getElementById('m-coords').innerText = `${Number(lat).toFixed(4)}, ${Number(lon).toFixed(4)}`;
+      document.getElementById('m-map-btn').onclick = () => {
+        window.openGoogleDirectionsModal({
+          destLat: lat,
+          destLon: lon,
+          destName: item.name,
+          destAddress: `${item.district || 'Trung tâm'}, ${item.city || 'Việt Nam'}`
+        });
+      };
+
+      document.getElementById('detail-modal').classList.remove('hidden');
+      lucide.createIcons();
+
+      // Gọi nạp đánh giá bằng item.id
+      loadReviewsForDestination(item.id);
+      if (item && item.id && typeof trackDestinationView === 'function') {
+        trackDestinationView(item.id);
+      }
+    }
+    function closeModal() {
+      document.getElementById('detail-modal').classList.add('hidden');
+    }
+
+    function setActiveNav() {
+      const currentPath = window.location.pathname.split("/").pop() || "index.html";
+      const currentHash = window.location.hash;
+      const navLinks = document.querySelectorAll("#main-nav-links .nav-link-custom");
+
+      navLinks.forEach(link => {
+        link.classList.remove("active");
+        const pageTarget = link.getAttribute("data-page");
+
+        if (currentHash && pageTarget === currentHash) {
+          link.classList.add("active");
+        } else if (!currentHash && (pageTarget === currentPath || (currentPath === "" && pageTarget === "index.html"))) {
+          link.classList.add("active");
+        }
+      });
+    }
+
+    function resetFilters() {
+      document.getElementById('filter-city').value = 'all';
+      document.getElementById('search-input').value = '';
+      document.querySelectorAll('#filter-category input').forEach(el => el.checked = false);
+      document.querySelector('#filter-price input[value="all"]').checked = true;
+      document.querySelector('#filter-rating input[value="all"]').checked = true;
+      applyFilters();
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      checkUserSession();
+      loadExploreData();
+      lucide.createIcons();
+      setActiveNav();
+      syncFavoritesFromDatabase();
+    });
+    window.addEventListener("hashchange", setActiveNav);
+  </script>
+</body>
+
+</html>

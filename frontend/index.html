@@ -1,0 +1,2385 @@
+<!DOCTYPE html>
+<html lang="vi" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smart Tourism AI - Nền Tảng Du Lịch Thông Minh Việt Nam</title>
+  
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons & Lucide Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <!-- Leaflet Map CSS & JS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <!-- Plus Jakarta Sans Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <!-- Be Vietnam Pro Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --emerald-50: #ecfdf5;
+      --emerald-100: #d1fae5;
+      --emerald-600: #059669;
+      --emerald-700: #047857;
+      --emerald-800: #065f46;
+      --emerald-900: #064e3b;
+    }
+
+    body { 
+      font-family: 'Plus Jakarta Sans', sans-serif; 
+      background-color: #f8fafc;
+      color: #1e293b;
+      min-height: 100vh;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    .user-profile-btn {
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(5, 150, 105, 0.25);
+      border-radius: 9999px;
+      padding: 5px 14px 5px 6px;
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+    .user-profile-btn:hover {
+      background: #ffffff;
+      border-color: var(--emerald-600);
+      transform: translateY(-1px);
+    }
+    .user-avatar-circle {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--emerald-800);
+      color: #ffffff;
+      font-weight: 700;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 5px rgba(4, 120, 87, 0.3);
+    }
+    .user-dropdown-menu {
+      border-radius: 18px;
+      border: 1px solid #f1f5f9;
+      box-shadow: 0 15px 30px -5px rgba(0, 0, 0, 0.1);
+      padding: 8px;
+      min-width: 190px;
+    }
+    .user-dropdown-menu .dropdown-item {
+      border-radius: 10px;
+      padding: 8px 12px;
+      font-weight: 600;
+      font-size: 13px;
+    }
+
+    .hero-bg-container {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -10;
+      overflow: hidden;
+      background-color: #020617;
+    }
+    .hero-bg-overlay {
+      position: absolute;
+      inset: 0;
+      background-color: rgba(15, 23, 42, 0.45);
+      z-index: 10;
+    }
+    .bg-fade {
+      transition: opacity 0.6s ease-in-out;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transform: scale(1.05);
+    }
+
+    .location-tag {
+      position: fixed;
+      top: 80px;
+      right: 32px;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      border-radius: 9999px;
+      background: rgba(15, 23, 42, 0.65);
+      backdrop-filter: blur(12px);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 600;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    .pulse-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 9999px;
+      background-color: #34d399;
+      animation: ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;
+    }
+    @keyframes ping {
+      75%, 100% { transform: scale(2); opacity: 0; }
+    }
+
+    .nav-glass {
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(16px);
+      border-radius: 16px;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .logo-badge {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background-color: var(--emerald-700);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-weight: bold;
+    }
+
+    .hero-card {
+      background: rgba(255, 255, 255, 0.65);
+      backdrop-filter: blur(16px);
+      border-radius: 24px;
+      border: 1px solid rgba(255, 255, 255, 0.8);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+      padding: 36px 30px;
+    }
+    .filter-box {
+      background: rgba(255, 255, 255, 0.85);
+      padding: 14px;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .filter-box:hover {
+      border-color: var(--emerald-600);
+      transform: translateY(-2px);
+    }
+    .filter-box.show,
+    .dropdown.show > .filter-box {
+      border-color: var(--emerald-600);
+      box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.18);
+    }
+    .hero-dropdown-menu {
+      border-radius: 18px !important;
+      border: 1px solid rgba(0, 0, 0, 0.08) !important;
+      box-shadow: 0 20px 45px -10px rgba(0, 0, 0, 0.18) !important;
+      padding: 8px !important;
+      min-width: 230px;
+      z-index: 1050;
+      backdrop-filter: blur(20px);
+      background: rgba(255, 255, 255, 0.98);
+      animation: heroDropdownFade 0.2s ease;
+    }
+    @keyframes heroDropdownFade {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .hero-dropdown-menu .dropdown-item {
+      border-radius: 12px;
+      padding: 9px 12px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #334155;
+      transition: all 0.15s ease;
+    }
+    .hero-dropdown-menu .dropdown-item:hover {
+      background-color: var(--emerald-50);
+      color: var(--emerald-800);
+      transform: translateX(2px);
+    }
+    .hero-dropdown-menu .dropdown-item.active {
+      background-color: var(--emerald-800) !important;
+      color: #ffffff !important;
+    }
+    .hero-dropdown-menu .dropdown-item.active .text-muted {
+      color: rgba(255, 255, 255, 0.8) !important;
+    }
+    .btn-emerald {
+      background-color: var(--emerald-800);
+      color: #ffffff;
+      font-weight: 800;
+      padding: 14px;
+      border-radius: 16px;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .btn-emerald:hover {
+      background-color: var(--emerald-900);
+      color: #ffffff;
+    }
+
+    .main-surface {
+      position: relative;
+      z-index: 30;
+      background: #ffffff;
+      border-top-left-radius: 40px;
+      border-top-right-radius: 40px;
+      padding-top: 48px;
+      border-top: 1px solid #f1f5f9;
+    }
+
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+    .dest-scroll-wrapper {
+      display: flex;
+      gap: 24px;
+      overflow-x: auto;
+      scroll-behavior: smooth;
+      padding: 16px 4px;
+    }
+    .dest-scroll-wrapper .demo-style-card {
+      min-width: 300px;
+      max-width: 300px;
+    }
+    .demo-style-card {
+      height: 384px;
+      width: 100%;
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 12px 24px -6px rgba(0, 0, 0, 0.15);
+      position: relative;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      cursor: pointer;
+      background: #020617;
+      transition: all 0.3s ease;
+    }
+    .demo-style-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 20px 30px -8px rgba(0, 0, 0, 0.3);
+    }
+    .demo-style-card img.card-bg-img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.6s ease;
+    }
+    .demo-style-card:hover img.card-bg-img {
+      transform: scale(1.08);
+    }
+    .card-dark-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, #020617 0%, rgba(2, 6, 23, 0.45) 55%, transparent 100%);
+    }
+    .card-btn-arrow {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: #10b981;
+      color: #020617;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      transition: all 0.2s ease;
+    }
+    .card-btn-arrow:hover {
+      background: #34d399;
+      transform: scale(1.15);
+    }
+
+    .weather-card-box {
+      border-radius: 36px;
+      padding: 36px 40px;
+      color: #ffffff;
+      position: relative;
+      overflow: hidden;
+      width: 100%;
+      min-height: 480px;
+      background-size: cover;
+      background-position: center;
+      transition: background-image 1s ease-in-out;
+    }
+    .theme-sunny {
+      background-image: linear-gradient(135deg, rgba(30, 114, 218, 0.55) 0%, rgba(56, 189, 248, 0.35) 100%), 
+                        url('https://images.unsplash.com/photo-1534088568595-a066f410bcda?auto=format&fit=crop&w=1400&q=80');
+    }
+    .theme-rainy {
+      background-image: linear-gradient(135deg, rgba(15, 23, 42, 0.7) 0%, rgba(30, 41, 59, 0.8) 100%), 
+                        url('https://images.unsplash.com/photo-1519692933481-e162a57d6721?auto=format&fit=crop&w=1400&q=80');
+    }
+    .theme-night {
+      background-image: linear-gradient(135deg, rgba(2, 6, 23, 0.75) 0%, rgba(15, 23, 42, 0.85) 100%), 
+                        url('https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?auto=format&fit=crop&w=1400&q=80');
+    }
+    .sun-flare {
+      position: absolute;
+      top: -80px;
+      left: 15%;
+      width: 380px;
+      height: 380px;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.95) 0%, rgba(254, 240, 138, 0.5) 30%, rgba(56, 189, 248, 0.2) 60%, transparent 80%);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 1;
+    }
+    .rain-container {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 1;
+      display: none;
+    }
+    .theme-rainy .rain-container { display: block; }
+    .rain-drop {
+      position: absolute;
+      width: 1.5px;
+      height: 26px;
+      background: linear-gradient(transparent, rgba(255, 255, 255, 0.65));
+      animation: fall linear infinite;
+    }
+    @keyframes fall {
+      0% { transform: translateY(-30px); }
+      100% { transform: translateY(550px); }
+    }
+    .ios-widget {
+      background: rgba(255, 255, 255, 0.18);
+      backdrop-filter: blur(28px);
+      border-radius: 24px;
+      border: 1px solid rgba(255, 255, 255, 0.28);
+      padding: 20px 22px;
+      position: relative;
+      z-index: 2;
+    }
+    .ios-hourly-track {
+      display: flex;
+      gap: 18px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+      scroll-behavior: smooth;
+    }
+    .ios-hourly-track::-webkit-scrollbar { height: 5px; }
+    .ios-hourly-track::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.35); border-radius: 10px; }
+    .ios-hourly-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      min-width: 54px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .daily-scroll-container {
+      max-height: 220px;
+      overflow-y: auto;
+      padding-right: 6px;
+      scroll-behavior: smooth;
+    }
+    .daily-scroll-container::-webkit-scrollbar { width: 4px; }
+    .daily-scroll-container::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.35); border-radius: 10px; }
+    .temp-bar-bg {
+      height: 4px;
+      background: rgba(0, 0, 0, 0.18);
+      border-radius: 4px;
+      flex-grow: 1;
+      position: relative;
+      overflow: hidden;
+    }
+    .temp-bar-fill {
+      position: absolute;
+      left: 15%;
+      right: 15%;
+      height: 100%;
+      background: linear-gradient(90deg, #fbbf24, #f97316);
+      border-radius: 4px;
+    }
+
+    .nearby-filter-btn {
+      background: #f1f5f9;
+      color: #334155;
+      font-weight: 600;
+      border: 1px solid #e2e8f0;
+      border-radius: 9999px;
+      padding: 6px 16px;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    .nearby-filter-btn:hover, .nearby-filter-btn.active {
+      background: var(--emerald-800);
+      color: #ffffff;
+      border-color: var(--emerald-800);
+    }
+    .nearby-item-card {
+      background: #ffffff;
+      border-radius: 20px;
+      border: 1px solid #f1f5f9;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      cursor: pointer;
+    }
+    .nearby-item-card:hover {
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08);
+      transform: translateY(-2px);
+    }
+    .nearby-thumb {
+      width: 78px;
+      height: 78px;
+      border-radius: 14px;
+      object-fit: cover;
+      flex-shrink: 0;
+    }
+    .btn-direction-dark {
+      background-color: #064e3b;
+      color: #ffffff;
+      font-size: 12px;
+      font-weight: 700;
+      border-radius: 9999px;
+      padding: 8px 16px;
+      border: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-direction-light {
+      background-color: #e0f2fe;
+      color: #0369a1;
+      font-size: 12px;
+      font-weight: 700;
+      border-radius: 9999px;
+      padding: 8px 16px;
+      border: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .nearby-map-box {
+      border-radius: 24px;
+      overflow: hidden;
+      border: 1px solid #e2e8f0;
+      position: relative;
+      height: 380px;
+    }
+    #nearby-leaflet-map {
+      width: 100%;
+      height: 100% !important;
+      min-height: 380px;
+      z-index: 1;
+    }
+    .map-badge-top-left {
+      position: absolute;
+      top: 14px;
+      left: 14px;
+      z-index: 10;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 6px 14px;
+      border-radius: 9999px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #0f172a;
+    }
+    .map-badge-top-right {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      z-index: 10;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 6px 14px;
+      border-radius: 9999px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #059669;
+    }
+    .map-badge-bottom {
+      position: absolute;
+      bottom: 12px;
+      left: 12px;
+      right: 12px;
+      z-index: 10;
+      background: rgba(255, 255, 255, 0.95);
+      padding: 8px 16px;
+      border-radius: 9999px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    #modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background: rgba(2, 6, 23, 0.75);
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+    #modal-backdrop.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    #modal-box {
+      background: #ffffff;
+      color: #1e293b;
+      width: 100%;
+      max-width: 520px;
+      border-radius: 28px;
+      overflow: hidden;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35);
+      transform: scale(0.92);
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      flex-direction: column;
+      max-height: 88vh;
+      position: relative;
+    }
+    #modal-backdrop.active #modal-box {
+      transform: scale(1);
+    }
+
+    .floating-survey-btn {
+      position: fixed;
+      bottom: 28px;
+      right: 28px;
+      z-index: 1000;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #059669 0%, #064e3b 100%);
+      color: #ffffff;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      border: 3px solid #ffffff;
+      box-shadow: 0 10px 25px -3px rgba(5, 150, 105, 0.5);
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .survey-badge-pulse {
+      position: absolute;
+      top: -2px;
+      right: -2px;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background-color: #f59e0b;
+      border: 2px solid #ffffff;
+      animation: ping 1.8s infinite;
+    }
+
+    #survey-modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 10000;
+      background: rgba(2, 6, 23, 0.8);
+      backdrop-filter: blur(10px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+    #survey-modal-backdrop.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    #survey-modal-box {
+      background: #ffffff;
+      width: 100%;
+      max-width: 820px;
+      border-radius: 28px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      max-height: 90vh;
+    }
+
+    .survey-option-card {
+      transition: all 0.2s ease;
+      cursor: pointer;
+      border: 2px solid #e2e8f0;
+      background: #ffffff;
+      border-radius: 16px;
+      padding: 14px 16px;
+      position: relative;
+    }
+    .survey-option-card.selected {
+      border-color: #065f46;
+      background-color: #f0fdf4;
+    }
+
+    .nav-link-custom {
+      color: #64748b;
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+    .nav-link-custom:hover {
+      color: var(--emerald-700);
+    }
+    .nav-link-custom.active {
+      color: var(--emerald-700) !important;
+      font-weight: 800;
+    }
+
+    .btn-favorite-heart {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      z-index: 15;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .btn-favorite-heart:hover {
+      transform: scale(1.15);
+      background: rgba(15, 23, 42, 0.85);
+    }
+    .btn-favorite-heart.favorited {
+      background: #ffffff;
+      color: #ef4444;
+      border-color: #fca5a5;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HERO SLIDESHOW -->
+  <div class="hero-bg-container">
+    <div class="hero-bg-overlay"></div>
+    <img id="bg-image" src="assets/images/anh1.jpg" alt="Phong cảnh Việt Nam" class="bg-fade">
+  </div>
+
+  <div class="location-tag d-none d-md-flex">
+    <span class="pulse-dot"></span>
+    <span id="location-text">Danh lam thắng cảnh • Vịnh Hạ Long, Quảng Ninh</span>
+  </div>
+
+  <!-- NAVBAR -->
+  <div class="container sticky-top pt-3" style="max-width: 1240px; z-index: 50;">
+    <header class="nav-glass">
+      <a href="index.html" class="d-flex align-items-center gap-3 text-decoration-none">
+        <div class="logo-badge">
+          <i class="bi bi-stars"></i>
+        </div>
+        <div>
+          <div class="d-flex align-items-center gap-2">
+            <span class="fs-6 fw-bold text-dark tracking-tight">Smart Tourism <span style="color: var(--emerald-700);">AI</span></span>
+            <span class="badge" style="font-size: 9px; background-color: var(--emerald-100); color: var(--emerald-800); font-weight: 700;">TÍCH HỢP AI</span>
+          </div>
+          <span class="small text-muted fw-semibold d-block" style="font-size: 11px;">Du lịch thông minh Việt Nam</span>
+        </div>
+      </a>
+
+      <nav id="main-nav-links" class="d-none d-lg-flex align-items-center gap-4 fw-bold small">
+        <a href="index.html" class="nav-link-custom active" data-page="index.html">Trang Chủ</a>
+        <a href="explore.html" class="nav-link-custom" data-page="explore.html">Khám Phá</a>
+        <a href="map.html" class="nav-link-custom" data-page="map.html">Bản đồ</a>
+        <a href="favorites.html" class="nav-link-custom" data-page="favorites.html">Yêu thích</a>
+        <a href="trip-planner.html" class="nav-link-custom" data-page="trip-planner.html">Lập Lịch Trình</a>
+      </nav>
+
+      <div class="d-flex align-items-center gap-2">
+        <a href="search.html" class="btn btn-sm btn-light rounded-circle text-secondary p-2 d-flex align-items-center justify-content-center shadow-sm" style="width: 38px; height: 38px;" title="Tìm kiếm">
+          <i class="bi bi-search"></i>
+        </a>
+
+        <div id="nav-user-area">
+          <a href="signin.html" id="nav-login-btn" class="btn btn-sm rounded-pill px-4 text-white fw-bold d-flex align-items-center gap-2" style="background-color: var(--emerald-800);">
+            <span>Đăng Nhập</span>
+            <i class="bi bi-arrow-right"></i>
+          </a>
+        </div>
+      </div>
+    </header>
+  </div>
+
+  <!-- HERO SECTION -->
+  <main class="container text-center pt-5 pb-5" style="max-width: 860px; position: relative; z-index: 20;">
+    <div class="hero-card">
+      <div class="d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill mb-3" style="background: rgba(6, 95, 70, 0.1); color: var(--emerald-900); font-size: 11px; font-weight: 800; border: 1px solid rgba(5, 150, 105, 0.2);">
+        <i class="bi bi-stars" style="color: var(--emerald-700);"></i>
+        KHÁM PHÁ VIỆT NAM THEO PHONG CÁCH CỦA BẠN
+      </div>
+
+      <h1 class="display-5 fw-bold text-dark tracking-tight mb-3">
+        Điểm Đến Tiếp Theo? <br>
+        <span style="color: var(--emerald-800);">Hành Trình Độc Bản Bắt Đầu Từ Đây</span>
+      </h1>
+
+      <p class="text-secondary fw-semibold small mx-auto mb-4" style="max-width: 620px;">
+        Lịch trình cá nhân hóa tự động đề xuất bởi Trí tuệ nhân tạo. Tùy chọn điểm đến, thời lượng và phong cách du lịch để nhận ngay gợi ý chuẩn xác.
+      </p>
+
+      <!-- BỘ 4 THÔNG SỐ CHỌN LỊCH TRÌNH (GIỮ NGUYÊN GIAO DIỆN GLASSMORPHISM) -->
+      <div class="row g-2 mb-3 text-start">
+        
+        <!-- 1. ĐỊA ĐIỂM -->
+        <div class="col-6 col-md-3">
+          <div class="dropdown h-100">
+            <div class="filter-box d-flex flex-column justify-content-between h-100" data-bs-toggle="dropdown" aria-expanded="false" role="button">
+              <span class="text-muted fw-bold d-block text-uppercase" style="font-size: 10px; letter-spacing: 0.5px;">Địa Điểm</span>
+              <div class="d-flex align-items-center justify-content-between mt-1">
+                <div class="d-flex align-items-center gap-1.5 fw-bold text-dark small text-truncate">
+                  <i class="bi bi-geo-alt-fill" style="color: var(--emerald-700); font-size: 13px;"></i>
+                  <span id="hero-dest-val" class="text-truncate">Đà Nẵng</span>
+                </div>
+                <i class="bi bi-chevron-down text-muted" style="font-size: 11px;"></i>
+              </div>
+            </div>
+            <ul class="dropdown-menu hero-dropdown-menu shadow-lg border-0 rounded-4 p-2 mt-2" style="font-size: 13px; max-height: 280px; overflow-y: auto;">
+              <li class="dropdown-header text-uppercase fw-bold text-muted px-2 py-1" style="font-size: 10px;">Chọn Tỉnh / Thành Phố</li>
+              <li><a class="dropdown-item rounded-3 py-2 fw-semibold active" href="javascript:void(0)" onclick="selectHeroCity('Đà Nẵng', 'Đà Nẵng', this)">📍 Đà Nẵng</a></li>
+              <li><a class="dropdown-item rounded-3 py-2 fw-semibold" href="javascript:void(0)" onclick="selectHeroCity('Hà Nội', 'Hà Nội', this)">📍 Hà Nội</a></li>
+              <li><a class="dropdown-item rounded-3 py-2 fw-semibold" href="javascript:void(0)" onclick="selectHeroCity('Hội An', 'Quảng Nam', this)">📍 Hội An (Quảng Nam)</a></li>
+              <li><a class="dropdown-item rounded-3 py-2 fw-semibold" href="javascript:void(0)" onclick="selectHeroCity('Đà Lạt', 'Lâm Đồng', this)">📍 Đà Lạt (Lâm Đồng)</a></li>
+              <li><a class="dropdown-item rounded-3 py-2 fw-semibold" href="javascript:void(0)" onclick="selectHeroCity('Nha Trang', 'Khánh Hòa', this)">📍 Nha Trang (Khánh Hòa)</a></li>
+              <li><a class="dropdown-item rounded-3 py-2 fw-semibold" href="javascript:void(0)" onclick="selectHeroCity('Hạ Long', 'Quảng Ninh', this)">📍 Hạ Long (Quảng Ninh)</a></li>
+              <li><a class="dropdown-item rounded-3 py-2 fw-semibold" href="javascript:void(0)" onclick="selectHeroCity('Phú Quốc', 'Kiên Giang', this)">📍 Phú Quốc (Kiên Giang)</a></li>
+              <li><a class="dropdown-item rounded-3 py-2 fw-semibold" href="javascript:void(0)" onclick="selectHeroCity('Huế', 'Thừa Thiên Huế', this)">📍 Huế</a></li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- 2. THỜI GIAN -->
+        <div class="col-6 col-md-3">
+          <div class="dropdown h-100">
+            <div class="filter-box d-flex flex-column justify-content-between h-100" data-bs-toggle="dropdown" aria-expanded="false" role="button">
+              <span class="text-muted fw-bold d-block text-uppercase" style="font-size: 10px; letter-spacing: 0.5px;">Thời Gian</span>
+              <div class="d-flex align-items-center justify-content-between mt-1">
+                <div class="d-flex align-items-center gap-1.5 fw-bold text-dark small text-truncate">
+                  <i class="bi bi-calendar3" style="color: var(--emerald-700); font-size: 13px;"></i>
+                  <span id="hero-duration-val" class="text-truncate">3 Ngày 2 Đêm</span>
+                </div>
+                <i class="bi bi-chevron-down text-muted" style="font-size: 11px;"></i>
+              </div>
+            </div>
+            <ul class="dropdown-menu hero-dropdown-menu shadow-lg border-0 rounded-4 p-2 mt-2" style="font-size: 13px;">
+              <li class="dropdown-header text-uppercase fw-bold text-muted px-2 py-1" style="font-size: 10px;">Thời Lượng Chuyến Đi</li>
+              <li><a class="dropdown-item rounded-3 py-2 fw-semibold" href="javascript:void(0)" onclick="selectHeroDuration(1, '1 Ngày', this)">⚡ 1 Ngày (Trong ngày)</a></li>
+              <li><a class="dropdown-item rounded-3 py-2 fw-semibold" href="javascript:void(0)" onclick="selectHeroDuration(2, '2 Ngày 1 Đêm', this)">🗓️ 2 Ngày 1 Đêm (Cuối tuần)</a></li>
+              <li><a class="dropdown-item rounded-3 py-2 fw-semibold active" href="javascript:void(0)" onclick="selectHeroDuration(3, '3 Ngày 2 Đêm', this)">✨ 3 Ngày 2 Đêm (Khuyên dùng)</a></li>
+              <li><a class="dropdown-item rounded-3 py-2 fw-semibold" href="javascript:void(0)" onclick="selectHeroDuration(4, '4 Ngày 3 Đêm', this)">🏖️ 4 Ngày 3 Đêm (Trọn vẹn)</a></li>
+              <li><a class="dropdown-item rounded-3 py-2 fw-semibold" href="javascript:void(0)" onclick="selectHeroDuration(5, '5 Ngày 4 Đêm', this)">🚀 5 Ngày 4 Đêm (Khám phá sâu)</a></li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- 3. NGÂN SÁCH -->
+        <div class="col-6 col-md-3">
+          <div class="dropdown h-100">
+            <div class="filter-box d-flex flex-column justify-content-between h-100" data-bs-toggle="dropdown" aria-expanded="false" role="button">
+              <span class="text-muted fw-bold d-block text-uppercase" style="font-size: 10px; letter-spacing: 0.5px;">Ngân Sách</span>
+              <div class="d-flex align-items-center justify-content-between mt-1">
+                <div class="d-flex align-items-center gap-1.5 fw-bold text-dark small text-truncate">
+                  <i class="bi bi-wallet2" style="color: var(--emerald-700); font-size: 13px;"></i>
+                  <span id="hero-budget-val" class="text-truncate">Tiêu chuẩn</span>
+                </div>
+                <i class="bi bi-chevron-down text-muted" style="font-size: 11px;"></i>
+              </div>
+            </div>
+            <ul class="dropdown-menu hero-dropdown-menu shadow-lg border-0 rounded-4 p-2 mt-2" style="font-size: 13px;">
+              <li class="dropdown-header text-uppercase fw-bold text-muted px-2 py-1" style="font-size: 10px;">Mức Chi Phí Dự Kiến</li>
+              <li><a class="dropdown-item rounded-3 py-2 fw-semibold" href="javascript:void(0)" onclick="selectHeroBudget('Tiết kiệm', this)">🎒 Tiết kiệm (&lt; 1tr/ngày)</a></li>
+              <li><a class="dropdown-item rounded-3 py-2 fw-semibold active" href="javascript:void(0)" onclick="selectHeroBudget('Tiêu chuẩn', this)">🏨 Tiêu chuẩn (1 - 3tr/ngày)</a></li>
+              <li><a class="dropdown-item rounded-3 py-2 fw-semibold" href="javascript:void(0)" onclick="selectHeroBudget('Cao cấp', this)">💎 Cao cấp (&gt; 3tr/ngày)</a></li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- 4. SỞ THÍCH -->
+        <div class="col-6 col-md-3">
+          <div class="dropdown h-100">
+            <div class="filter-box d-flex flex-column justify-content-between h-100" data-bs-toggle="dropdown" aria-expanded="false" role="button">
+              <div class="d-flex align-items-center justify-content-between">
+                <span class="text-muted fw-bold text-uppercase" style="font-size: 10px; letter-spacing: 0.5px;">Sở Thích</span>
+                <span id="hero-survey-badge" class="badge rounded-pill bg-success-subtle text-success fw-bold" style="font-size: 8px; display: none;">✓ Theo khảo sát</span>
+              </div>
+              <div class="d-flex align-items-center justify-content-between mt-1">
+                <div class="d-flex align-items-center gap-1.5 fw-bold text-dark small text-truncate">
+                  <i class="bi bi-compass-fill" style="color: var(--emerald-700); font-size: 13px;"></i>
+                  <span id="hero-interest-val" class="text-truncate">Nghỉ Dưỡng &amp; Ẩm Thực</span>
+                </div>
+                <i class="bi bi-chevron-down text-muted" style="font-size: 11px;"></i>
+              </div>
+            </div>
+            <ul id="hero-interest-dropdown" class="dropdown-menu hero-dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-4 p-2 mt-2" style="font-size: 13px; min-width: 260px;">
+              <!-- Nội dung động nạp qua JS dựa theo có hay không có khảo sát -->
+            </ul>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- THANH HÀNH ĐỘNG TỰ ĐỘNG TẠO LỊCH TRÌNH (GIỮ NGUYÊN FORM DÁNG PILL & THEME) -->
+      <div class="d-flex flex-column flex-sm-row align-items-center justify-content-between mb-4 shadow-sm rounded-pill bg-white p-1 ps-sm-3 pe-1 gap-2 border border-white">
+        <div class="d-flex align-items-center gap-2 min-w-0 text-start py-1 px-2 px-sm-0 w-100 w-sm-auto">
+          <div class="rounded-circle d-flex align-items-center justify-content-center shrink-0" style="width: 32px; height: 32px; background: rgba(5, 150, 105, 0.12); color: var(--emerald-800);">
+            <i class="bi bi-stars"></i>
+          </div>
+          <div class="text-truncate flex-grow-1">
+            <div id="hero-cta-summary" class="text-dark fw-bold small text-truncate">
+              Lộ trình AI: <strong>Đà Nẵng</strong> • <strong>3 Ngày 2 Đêm</strong> • <strong>Nghỉ Dưỡng &amp; Ẩm Thực</strong>
+            </div>
+            <div class="text-muted text-truncate" style="font-size: 11px;">
+              Tự động phân bổ lịch trình, lộ trình di chuyển và địa điểm nổi bật
+            </div>
+          </div>
+        </div>
+
+        <button id="btn-auto-create-trip" class="btn btn-emerald rounded-pill px-4 py-2.5 fw-bold text-white d-flex align-items-center justify-content-center gap-2 shrink-0 shadow-sm w-100 w-sm-auto" type="button" onclick="startAutoTripPlanner()">
+          <i class="bi bi-magic"></i>
+          <span>Tự Động Tạo Lịch Trình</span>
+          <i class="bi bi-arrow-right"></i>
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <div class="main-surface">
+    <!-- 1. ĐIỂM ĐẾN NỔI BẬT -->
+    <section id="featured" class="container py-4" style="max-width: 1240px;">
+      <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end gap-3 mb-4">
+        <div>
+          <div class="d-inline-flex align-items-center gap-1 small fw-bold text-uppercase px-3 py-1 rounded-pill mb-2" style="background-color: var(--emerald-50); color: var(--emerald-800);">
+            <i class="bi bi-award-fill"></i> ĐƯỢC CHỌN LỌC BỞI AI
+          </div>
+          <h2 class="fw-bold text-dark mb-1" id="featured-section-title">Điểm Đến Nổi Bật Dành Cho Bạn</h2>
+          <p class="text-muted small mb-0" id="featured-section-subtitle">Dữ liệu được tối ưu dựa trên sở thích và hành vi của bạn.</p>
+        </div>
+        
+        <div class="d-flex gap-2">
+          <button onclick="scrollDestinations(-350)" class="btn btn-outline-secondary rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+            <i class="bi bi-chevron-left"></i>
+          </button>
+          <button onclick="scrollDestinations(350)" class="btn btn-outline-secondary rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+            <i class="bi bi-chevron-right"></i>
+          </button>
+        </div>
+      </div>
+
+      <div id="destinations-scroll" class="dest-scroll-wrapper no-scrollbar">
+        <div class="w-100 text-center py-5 text-muted">
+          <div class="spinner-border text-success spinner-border-sm mb-2" role="status"></div>
+          <p class="small mb-0">Đang nạp các điểm đến từ MySQL...</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. PHỔ BIẾN & THỊNH HÀNH -->
+    <section id="popular" class="container py-5 border-top border-light-subtle" style="max-width: 1240px;">
+      <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end gap-2 mb-4">
+        <div>
+          <div class="d-inline-flex align-items-center gap-1 small fw-bold text-uppercase px-3 py-1 rounded-pill mb-2 bg-danger-subtle text-danger">
+            <i class="bi bi-fire"></i> XU HƯỚNG HÀNG ĐẦU TUẦN NÀY
+          </div>
+          <h2 class="fw-bold text-dark mb-1">Phổ Biến & Được Yêu Thích Nhất</h2>
+          <p class="text-muted small mb-0">Dữ liệu thống kê thời gian thực từ tương tác và lượt đánh giá của du khách.</p>
+        </div>
+      </div>
+
+      <div class="row g-4" id="popular-grid">
+        <div class="col-12 text-center py-5 text-muted">
+          <div class="spinner-border text-success spinner-border-sm mb-2" role="status"></div>
+          <p class="small mb-0">Đang nạp các điểm đến thịnh hành từ MySQL...</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. THỜI TIẾT THỜI GIAN THỰC -->
+    <section id="weather" class="py-5 bg-light border-top border-bottom border-light-subtle">
+      <div class="container" style="max-width: 1240px;">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end gap-3 mb-4">
+          <div>
+            <div class="d-inline-flex align-items-center gap-1 small fw-bold text-uppercase px-3 py-1 rounded-pill mb-2 bg-info-subtle text-primary">
+              <i class="bi bi-cloud-sun-fill"></i> THỜI TIẾT VỆ TINH THỜI GIAN THỰC
+            </div>
+            <h2 class="fw-bold text-dark mb-1">Dự Báo Khí Hậu Điểm Đến</h2>
+            <p class="text-muted small mb-0">Hệ thống AI tự động phân tích thời tiết và đưa ra lời khuyên lịch trình phù hợp</p>
+          </div>
+
+          <div class="d-flex flex-wrap gap-2" id="weather-tabs">
+            <button onclick="changeWeatherLocation('danang', this)" class="btn btn-sm rounded-pill px-3 fw-bold text-white shadow-sm weather-tab-btn active" style="background-color: var(--emerald-800);">
+              <i class="bi bi-geo-alt-fill me-1"></i> Đà Nẵng
+            </button>
+            <button onclick="changeWeatherLocation('halong', this)" class="btn btn-sm btn-white border rounded-pill px-3 fw-bold text-secondary weather-tab-btn">
+              Vịnh Hạ Long
+            </button>
+            <button onclick="changeWeatherLocation('dalat', this)" class="btn btn-sm btn-white border rounded-pill px-3 fw-bold text-secondary weather-tab-btn">
+              Đà Lạt
+            </button>
+            <button onclick="changeWeatherLocation('phuquoc', this)" class="btn btn-sm btn-white border rounded-pill px-3 fw-bold text-secondary weather-tab-btn">
+              Phú Quốc
+            </button>
+            <button onclick="changeWeatherLocation('hanoi', this)" class="btn btn-sm btn-white border rounded-pill px-3 fw-bold text-secondary weather-tab-btn">
+              Hà Nội
+            </button>
+          </div>
+        </div>
+
+        <div id="weather-card" class="weather-card-box theme-sunny shadow-lg">
+          <div class="sun-flare" id="sun-flare-effect"></div>
+          <div class="rain-container" id="rain-particles"></div>
+
+          <div class="row g-4 align-items-stretch position-relative" style="z-index: 2;">
+            <div class="col-lg-7 d-flex flex-column justify-content-between">
+              <div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
+                <div>
+                  <div class="d-flex align-items-center gap-1 small text-white text-opacity-80 fw-bold mb-1" style="font-size: 13px;">
+                    <i class="bi bi-cursor-fill" style="font-size: 11px;"></i> ĐIỂM ĐẾN HIỆN TẠI
+                  </div>
+                  <h2 id="weather-location" class="fw-bold mb-1" style="font-size: 34px;">Thành Phố Đà Nẵng</h2>
+                  <div id="weather-condition" class="fs-5 fw-semibold text-white text-opacity-95">Nhiều nắng</div>
+                  <div id="weather-range" class="small fw-semibold text-white text-opacity-85">C:32° · T:26°</div>
+                </div>
+                <div>
+                  <div id="weather-temp" class="fw-light my-0" style="font-size: 88px; line-height: 1;">32°</div>
+                </div>
+              </div>
+
+              <div class="ios-widget mt-2">
+                <div id="weather-summary-text" class="small fw-semibold text-white text-opacity-95 mb-3 pb-2 border-bottom border-white border-opacity-20">
+                  Có nắng sẽ tiếp tục cả ngày. Rất thích hợp để tham quan dã ngoại.
+                </div>
+                <div class="ios-hourly-track" id="hourly-forecast-list"></div>
+              </div>
+            </div>
+
+            <div class="col-lg-5">
+              <div class="ios-widget d-flex flex-column justify-content-between h-100">
+                <div class="d-flex align-items-center gap-2 small text-white text-opacity-80 fw-bold text-uppercase mb-2 pb-2 border-bottom border-white border-opacity-20" style="font-size: 11px;">
+                  <i class="bi bi-calendar4-week"></i> DỰ BÁO 7 NGÀY TỚI
+                </div>
+                <div id="daily-forecast-list" class="daily-scroll-container flex-grow-1"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. ĐỊA ĐIỂM XUNG QUANH BẠN & BẢN ĐỒ -->
+    <section id="nearby-section" class="py-5" style="background-color: #fafbfd;">
+      <div class="container" style="max-width: 1240px;">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end gap-2 mb-3">
+          <div>
+            <div id="nearby-current-city-label" class="d-flex align-items-center gap-1 small fw-bold text-uppercase" style="color: var(--emerald-800); font-size: 11px;">
+              <i class="bi bi-geo-alt-fill"></i> VỊ TRÍ HIỆN TẠI: TRUNG TÂM ĐÀ NẴNG
+            </div>
+            <h2 class="fw-bold mb-0 text-dark" style="font-size: 28px;">Địa Điểm Xung Quanh Bạn</h2>
+          </div>
+          <div>
+            <span class="badge rounded-pill px-3 py-2 fw-bold" style="background-color: #ccfbf1; color: #0f766e; font-size: 12px;">
+              Bán kính 35 km
+            </span>
+          </div>
+        </div>
+
+        <div class="d-flex flex-wrap gap-2 mb-4">
+          <button class="nearby-filter-btn active" onclick="filterNearby('all', this)">Tất cả (18)</button>
+          <button class="nearby-filter-btn" onclick="filterNearby('cafe', this)"><i class="bi bi-cup-hot me-1"></i>Cafe Rooftop</button>
+          <button class="nearby-filter-btn" onclick="filterNearby('culture', this)"><i class="bi bi-bank me-1"></i>Di tích văn hóa</button>
+          <button class="nearby-filter-btn" onclick="filterNearby('checkin', this)"><i class="bi bi-camera me-1"></i>Điểm Check-in</button>
+        </div>
+
+        <div class="row g-4 align-items-center">
+          <div class="col-lg-6 d-flex flex-column gap-3" id="nearby-places-list"></div>
+
+          <div class="col-lg-6">
+            <div class="nearby-map-box">
+              <div class="map-badge-top-left">
+                <i class="bi bi-map-fill text-primary me-1"></i> Bản Đồ Vệ Tinh Thời Gian Thực
+              </div>
+              <div class="map-badge-top-right">
+                <i class="bi bi-record-circle-fill me-1"></i> GPS Chuẩn Xác
+              </div>
+              
+              <div id="nearby-leaflet-map"></div>
+
+              <div class="map-badge-bottom">
+                <div class="d-flex align-items-center gap-2">
+                  <i class="bi bi-compass text-success fs-6"></i>
+                  <span>32 địa điểm du lịch & ẩm thực mở cửa gần bạn</span>
+                </div>
+                <a href="map.html" class="text-decoration-none text-dark fw-bold" style="font-size: 11px;">
+                  Mở bản đồ đầy đủ <i class="bi bi-arrow-right"></i>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="bg-dark text-white-50 py-5 mt-5 border-top border-secondary">
+      <div class="container text-center" style="max-width: 1240px;">
+        <h5 class="text-white fw-bold mb-2"><i class="bi bi-compass text-success me-2"></i>Smart Tourism AI</h5>
+        <p class="small text-secondary mb-0">&copy; 2026 Dự án Du Lịch Thông Minh Smart Tourism AI. Bản quyền thuộc về tác giả.</p>
+      </div>
+    </footer>
+  </div>
+
+  <!-- NÚT NỔI KHẢO SÁT -->
+  <button id="btn-floating-survey" class="floating-survey-btn" onclick="openSurveyModal()" title="Làm khảo sát sở thích du lịch AI">
+    <i class="bi bi-stars fs-4"></i>
+    <span class="survey-badge-pulse"></span>
+  </button>
+
+  <!-- MODAL KHẢO SÁT -->
+  <div id="survey-modal-backdrop">
+    <div id="survey-modal-box">
+      <div class="border-bottom px-4 py-3 bg-light d-flex align-items-center justify-content-between">
+        <div class="d-flex align-items-center gap-3">
+          <button id="survey-btn-back" onclick="prevSurveyStep()" class="btn btn-sm btn-white border rounded-pill px-3 fw-bold small text-secondary d-flex align-items-center gap-1">
+            <i class="bi bi-arrow-left"></i> Quay lại
+          </button>
+          
+          <div class="d-flex align-items-center gap-2">
+            <div class="progress" style="width: 120px; height: 8px; border-radius: 9999px;">
+              <div id="survey-progress-bar" class="progress-bar" role="progressbar" style="width: 25%; background-color: var(--emerald-800);"></div>
+            </div>
+            <span id="survey-step-indicator" class="badge bg-secondary-subtle text-secondary rounded-pill font-monospace" style="font-size: 11px;">
+              Bước 1/4
+            </span>
+          </div>
+        </div>
+
+        <button onclick="closeSurveyModal()" class="btn btn-sm btn-light rounded-circle text-muted" style="width: 32px; height: 32px;">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+
+      <div class="p-4 overflow-y-auto" style="flex-grow: 1;">
+        <div class="mb-3">
+          <div class="d-flex align-items-center justify-content-between">
+            <h4 id="survey-question-title" class="fw-bold text-dark mb-1" style="font-size: 20px;">
+              🏖 Bạn thích loại hình trải nghiệm nào?
+            </h4>
+            <span id="survey-badge-counter" class="badge rounded-pill px-3 py-1 bg-success-subtle text-success fw-bold" style="font-size: 11px;">
+              Đã chọn: 0/9
+            </span>
+          </div>
+          <p id="survey-question-subtitle" class="small text-muted mb-0">
+            Chọn các chủ đề bạn yêu thích nhất để AI gợi ý đúng gu nhé.
+          </p>
+        </div>
+
+        <div id="survey-options-container" class="row g-3 py-2"></div>
+      </div>
+
+      <div class="border-top px-4 py-3 bg-light d-flex align-items-center justify-content-between">
+        <button onclick="skipSurveyQuestion()" class="btn btn-sm btn-link text-muted text-decoration-none fw-semibold">
+          Bỏ qua bước này
+        </button>
+        
+        <button id="survey-btn-next" onclick="nextSurveyStep()" class="btn btn-sm text-white rounded-pill px-4 py-2 fw-bold d-flex align-items-center gap-2 shadow-sm" style="background-color: var(--emerald-800);">
+          <span id="survey-btn-next-text">Tiếp tục</span>
+          <i class="bi bi-arrow-right"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- POP-UP CHI TIẾT ĐỊA ĐIỂM (CẤU TRÚC ĐÃ ĐƯỢC CHUẨN HÓA) -->
+  <div id="modal-backdrop">
+    <div id="modal-box">
+      <button onclick="closeModal()" class="btn btn-sm btn-dark rounded-circle position-absolute" style="top: 14px; right: 14px; z-index: 20; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(8px); border: none;">
+        <i class="bi bi-x-lg text-white"></i>
+      </button>
+
+      <!-- Ảnh Header Modal -->
+      <div class="position-relative" style="height: 220px; width: 100%; flex-shrink: 0; background: #020617;">
+        <img id="m-img" src="" style="width: 100%; height: 100%; object-fit: cover;">
+        <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(15, 23, 42, 0.85) 0%, transparent 60%);"></div>
+        
+        <div class="position-absolute bottom-0 start-0 end-0 p-3 d-flex justify-content-between align-items-center">
+          <span id="m-category" class="badge rounded-pill px-3 py-1 fw-bold text-white shadow-sm" style="background-color: var(--emerald-800); font-size: 11px;">
+            Danh mục
+          </span>
+          <div id="m-space-tags" class="d-flex gap-1"></div>
+        </div>
+      </div>
+
+      <!-- Thân Modal có thanh cuộn -->
+      <div class="p-4 overflow-y-auto" style="flex-grow: 1;">
+        <div class="d-flex justify-content-between align-items-start gap-2 mb-3">
+          <div>
+            <h4 id="m-name" class="fw-bold text-dark mb-1" style="font-size: 19px; line-height: 1.3;">Tên điểm đến</h4>
+            <p class="small fw-bold mb-0 d-flex align-items-center gap-1" style="color: var(--emerald-800); font-size: 12px;">
+              <i class="bi bi-geo-alt-fill"></i>
+              <span id="m-address">Quận, Tỉnh Thành</span>
+            </p>
+          </div>
+          <span id="m-rating-badge" class="badge bg-warning text-dark fw-bold px-2.5 py-1" style="font-size: 13px;">
+            ★ 5.0
+          </span>
+        </div>
+
+        <div class="mb-3">
+          <span class="text-uppercase fw-bold text-muted d-block mb-1" style="font-size: 10px; letter-spacing: 0.5px;">MÔ TẢ ĐIỂM ĐẾN</span>
+          <p id="m-description" class="small text-secondary mb-0 leading-relaxed" style="font-size: 13px;">
+            Mô tả chi tiết...
+          </p>
+        </div>
+
+        <div class="row g-2 pt-1 mb-3">
+          <div class="col-6">
+            <div class="p-2.5 rounded-3 border bg-light">
+              <span class="text-uppercase fw-bold text-muted d-block mb-1" style="font-size: 9px;">CHI PHÍ DỰ KIẾN</span>
+              <span id="m-price" class="small fw-bold d-block" style="color: var(--emerald-800);">Miễn phí</span>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="p-2.5 rounded-3 border bg-light">
+              <span class="text-uppercase fw-bold text-muted d-block mb-1" style="font-size: 9px;">TỌA ĐỘ VỆ TINH</span>
+              <span id="m-coords" class="small fw-bold text-dark d-block">16.000, 108.000</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- KHỐI ĐÁNH GIÁ THỰC TẾ TỪ CƠ SỞ DỮ LIỆU -->
+        <div class="pt-3 border-top border-slate-200">
+          <div class="d-flex align-items-center justify-content-between mb-2">
+            <span class="fw-bold text-uppercase text-muted" style="font-size: 11px;">Đánh giá từ cộng đồng</span>
+            <span id="m-review-badge" class="fw-bold text-warning" style="font-size: 12px;">0 lượt nhận xét</span>
+          </div>
+
+          <!-- Form đánh giá -->
+          <div class="bg-light p-3 rounded-3 border mb-3">
+            <div class="d-flex align-items-center justify-content-between mb-2 fw-bold text-secondary" style="font-size: 12px;">
+              <span>Đánh giá của bạn:</span>
+              <div id="star-picker" class="d-flex gap-1 text-secondary cursor-pointer select-none fs-6">
+                <span onclick="setRating(1)" class="star-item text-warning">★</span>
+                <span onclick="setRating(2)" class="star-item text-warning">★</span>
+                <span onclick="setRating(3)" class="star-item text-warning">★</span>
+                <span onclick="setRating(4)" class="star-item text-warning">★</span>
+                <span onclick="setRating(5)" class="star-item text-warning">★</span>
+              </div>
+            </div>
+            
+            <div class="d-flex gap-2">
+              <input type="text" id="review-comment-input" placeholder="Chia sẻ trải nghiệm của bạn tại đây..." 
+                class="form-control form-control-sm rounded-pill px-3 shadow-none">
+              <button onclick="submitRealReview()" class="btn btn-sm btn-success rounded-pill px-3 fw-bold" style="background-color: var(--emerald-800); border: none;">
+                Gửi
+              </button>
+            </div>
+          </div>
+
+          <!-- Danh sách nhận xét -->
+          <div id="reviews-list-container" class="d-flex flex-column gap-2" style="max-height: 150px; overflow-y: auto;">
+            <p class="text-muted small fst-italic mb-0">Chưa có đánh giá nào. Hãy là người đầu tiên trải nghiệm!</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chân Modal -->
+      <div class="p-3 bg-light border-top d-flex gap-2 shrink-0">
+        <button onclick="closeModal()" class="btn btn-sm btn-outline-secondary rounded-pill px-4 fw-bold" style="width: 35%;">
+          Đóng
+        </button>
+        <button type="button" id="m-map-url" class="btn btn-sm text-white rounded-pill px-3 fw-bold d-flex align-items-center justify-content-center gap-2 border-0 cursor-pointer" style="background-color: var(--emerald-800); width: 65%;">
+          <span>Chỉ đường Maps</span>
+          <i class="bi bi-cursor-fill"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap 5 JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/js/sync-ai.js"></script>
+  <script src="assets/js/google-maps-directions.js"></script>
+  <!-- JAVASCRIPT CONTROLLERS -->
+  <script>
+    lucide.createIcons();
+    const API_BASE = "http://127.0.0.1:8000/api";
+    window.currentWeatherTheme = "sunny";
+
+    const CITY_QUERY_MAP = {
+      danang: { name: "Trung Tâm Đà Nẵng", lat: 16.0544, lon: 108.2022, cityDb: "Đà Nẵng" },
+      halong: { name: "Vịnh Hạ Long, Quảng Ninh", lat: 20.9505, lon: 107.0734, cityDb: "Quảng Ninh" },
+      dalat: { name: "Thành Phố Đà Lạt", lat: 11.9404, lon: 108.4583, cityDb: "Lâm Đồng" },
+      phuquoc: { name: "Đảo Phú Quốc", lat: 10.2899, lon: 103.9840, cityDb: "Phú Quốc" },
+      hanoi: { name: "Thủ Đô Hà Nội", lat: 21.0285, lon: 105.8542, cityDb: "Hà Nội" }
+    };
+
+    let currentCityKey = 'danang';
+    let nearbyMap = null;
+    let markersLayer = null;
+    let userMarker = null;
+    window.allDestinationsCache = {};
+
+    let selectedRatingStars = 5;
+    let currentActiveDestId = null;
+
+    const localGallery = [
+      'assets/images/anh1.jpg',
+      'assets/images/anh2.jpg',
+      'assets/images/ba na hill, da nang.jpg',
+      'assets/images/da lat.jpg',
+      'assets/images/dong son doong.jpg',
+      'assets/images/ho hoan kiem, ha noi.jpg',
+      'assets/images/hoian.jpg',
+      'assets/images/nha trang.jpg'
+    ];
+
+    function setRating(stars) {
+      selectedRatingStars = stars;
+      const starEls = document.querySelectorAll('#star-picker .star-item');
+      starEls.forEach((el, idx) => {
+        if (idx < stars) {
+          el.classList.add('text-warning');
+          el.classList.remove('text-secondary');
+        } else {
+          el.classList.remove('text-warning');
+          el.classList.add('text-secondary');
+        }
+      });
+    }
+
+    async function loadReviewsForDestination(destId) {
+      currentActiveDestId = destId;
+      setRating(5);
+      const inputEl = document.getElementById('review-comment-input');
+      if (inputEl) inputEl.value = '';
+
+      const listContainer = document.getElementById('reviews-list-container');
+      if (!listContainer) return;
+      listContainer.innerHTML = `<p class="text-muted small mb-0">Đang nạp đánh giá...</p>`;
+
+      try {
+        const res = await fetch(`${API_BASE}/destinations/${destId}/reviews`);
+        if (res.ok) {
+          const reviews = await res.json();
+          const badge = document.getElementById('m-review-badge');
+          if (badge) badge.innerText = `${reviews.length} nhận xét`;
+
+          if (reviews.length === 0) {
+            listContainer.innerHTML = `<p class="text-muted small fst-italic mb-0">Chưa có đánh giá nào cho điểm đến này. Hãy là người đầu tiên!</p>`;
+            return;
+          }
+
+          listContainer.innerHTML = reviews.map(r => `
+            <div class="bg-white p-2 rounded border small">
+              <div class="d-flex align-items-center justify-content-between mb-1">
+                <span class="fw-bold text-dark">${r.user_name}</span>
+                <span class="text-warning fw-bold">${'★'.repeat(r.rating)}</span>
+              </div>
+              <p class="text-secondary mb-1" style="font-size: 12px;">${r.comment}</p>
+              <span class="text-muted" style="font-size: 10px;">${r.created_at}</span>
+            </div>
+          `).join('');
+        }
+      } catch (e) {
+        listContainer.innerHTML = `<p class="text-muted small mb-0">Không thể tải đánh giá từ máy chủ.</p>`;
+      }
+    }
+
+    async function submitRealReview() {
+      if (!currentActiveDestId) return;
+
+      const commentVal = document.getElementById('review-comment-input').value.trim();
+      const userStr = localStorage.getItem('user');
+      const user = userStr ? JSON.parse(userStr) : null;
+      const userId = user ? user.id : 1;
+
+      try {
+        const res = await fetch(`${API_BASE}/destinations/review`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            destination_id: currentActiveDestId,
+            user_id: userId,
+            rating: selectedRatingStars,
+            comment: commentVal
+          })
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          const ratingBadge = document.getElementById('m-rating-badge');
+          if (ratingBadge) {
+            ratingBadge.innerText = `★ ${Number(data.new_rating).toFixed(1)}`;
+          }
+
+          alert(`Cảm ơn bạn! Hệ thống đã ghi nhận đánh giá ${selectedRatingStars} sao.`);
+          loadReviewsForDestination(currentActiveDestId);
+        } else {
+          alert('Không thể gửi đánh giá, vui lòng kiểm tra lại!');
+        }
+      } catch (err) {
+        alert('Lỗi kết nối tới máy chủ!');
+      }
+    }
+
+    function resolveLocalImage(item, index) {
+      if (item.featured_image && typeof item.featured_image === 'string' && item.featured_image.trim() !== '') {
+        const img = item.featured_image.trim();
+        if (img.startsWith('http://') || img.startsWith('https://') || img.startsWith('assets/')) {
+          return img;
+        }
+      }
+      return localGallery[index % localGallery.length];
+    }
+
+    const slides = [
+      { img: 'assets/images/anh1.jpg', location: 'Vịnh Hạ Long • Quảng Ninh' },
+      { img: 'assets/images/ba na hill, da nang.jpg', location: 'Bà Nà Hills • Đà Nẵng' },
+      { img: 'assets/images/da lat.jpg', location: 'Thành Phố Đà Lạt • Lâm Đồng' },
+      { img: 'assets/images/dong son doong.jpg', location: 'Hang Sơn Đoòng • Quảng Bình' },
+      { img: 'assets/images/ho hoan kiem, ha nội.jpg', location: 'Hồ Hoàn Kiếm • Hà Nội' },
+      { img: 'assets/images/hoian.jpg', location: 'Phố Cổ Hội An • Quảng Nam' },
+      { img: 'assets/images/nha trang.jpg', location: 'Vịnh Nha Trang • Khánh Hòa' },
+      { img: 'assets/images/anh2.jpg', location: 'Quần Thể Tràng An • Ninh Bình' }
+    ];
+
+    let currentSlide = 0;
+    function rotateBackground() {
+      const bgImage = document.getElementById('bg-image');
+      const locationText = document.getElementById('location-text');
+      if (!bgImage) return;
+
+      currentSlide = (currentSlide + 1) % slides.length;
+      bgImage.style.opacity = '0.2';
+
+      setTimeout(() => {
+        bgImage.src = slides[currentSlide].img;
+        if (locationText) {
+          locationText.innerText = 'Danh lam thắng cảnh • ' + slides[currentSlide].location;
+        }
+        bgImage.style.opacity = '1';
+      }, 400);
+    }
+    setInterval(rotateBackground, 2000);
+
+    /* MODAL CHI TIẾT ĐỊA ĐIỂM (ĐÃ SỬA THÀNH destId) */
+    function openModalById(destId) {
+      const data = window.allDestinationsCache[destId];
+      if (!data) return;
+
+      // 1. Ghi nhận lượt xem và báo AI học
+      if (typeof trackDestinationView === 'function') {
+        trackDestinationView(destId);
+      }
+
+      document.getElementById('m-img').src = data.featured_image || 'assets/images/anh1.jpg';
+      document.getElementById('m-name').innerText = data.name;
+      document.getElementById('m-category').innerText = data.category || 'Du lịch & Trải nghiệm';
+      document.getElementById('m-address').innerText = `${data.district || 'Trung tâm'}, ${data.city || 'Việt Nam'}`;
+      
+      const ratingEl = document.getElementById('m-rating-badge');
+      if (ratingEl) ratingEl.innerText = `★ ${(Number(data.rating) || 5.0).toFixed(1)}`;
+      
+      document.getElementById('m-description').innerText = data.description || data.short_description || 'Điểm đến độc đáo với nhiều trải nghiệm hấp dẫn.';
+      
+      const priceVal = Number(data.estimated_cost) || 0;
+      const priceStr = priceVal > 0 ? `${priceVal.toLocaleString('vi-VN')} VNĐ` : (data.price || 'Miễn phí');
+      document.getElementById('m-price').innerText = priceStr;
+
+      // 2. Chuẩn hóa tọa độ an toàn
+      const lat = parseFloat(data.latitude) || 16.0544;
+      const lon = parseFloat(data.longitude) || 108.2022;
+      document.getElementById('m-coords').innerText = `${lat.toFixed(4)}, ${lon.toFixed(4)}`;
+
+      const mapLinkEl = document.getElementById('m-map-url') || document.getElementById('m-map-btn');
+      if (mapLinkEl) {
+        mapLinkEl.onclick = () => {
+          window.openGoogleDirectionsModal({
+            destLat: lat,
+            destLon: lon,
+            destName: data.name,
+            destAddress: `${data.district || 'Đà Nẵng'}, Việt Nam`
+          });
+        };
+      }
+
+      // 4. Tag không gian
+      const spaceTags = document.getElementById('m-space-tags');
+      if (spaceTags) {
+        spaceTags.innerHTML = '';
+        if (data.is_indoor) {
+          spaceTags.innerHTML += `<span class="badge bg-dark bg-opacity-75 rounded-pill px-2.5 py-1 text-white" style="font-size: 10px;">🏠 Trong nhà</span>`;
+        }
+        if (data.is_outdoor || !data.is_indoor) {
+          spaceTags.innerHTML += `<span class="badge bg-warning bg-opacity-90 rounded-pill px-2.5 py-1 text-dark" style="font-size: 10px;">🌤 Ngoài trời</span>`;
+        }
+      }
+
+      document.getElementById('modal-backdrop').classList.add('active');
+      
+      // Nạp đánh giá thật từ CSDL
+      loadReviewsForDestination(destId);
+    }
+
+    function closeModal() {
+      document.getElementById('modal-backdrop').classList.remove('active');
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeModal();
+        closeSurveyModal();
+      }
+    });
+
+    document.getElementById('modal-backdrop').addEventListener('click', (e) => {
+      if (e.target.id === 'modal-backdrop') closeModal();
+    });
+
+    async function trackInteraction(destId, actionType) {
+      const user = JSON.parse(localStorage.getItem('user')) || { id: 2 };
+      try {
+        await fetch(`${API_BASE}/recommendations/track`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ user_id: user.id, destination_id: destId, action: actionType })
+        });
+      } catch (err) {}
+    }
+
+    function renderDemoStyleCard(item, index, badgeText, badgeBg) {
+      const imgPath = resolveLocalImage(item, index);
+      item.featured_image = imgPath;
+      window.allDestinationsCache[item.id] = item;
+
+      const favs = getFavorites();
+      const isFav = favs.includes(item.id);
+
+      // 1. TÍNH TOÁN GIÁ TIỀN CHUẨN XÁC TỪ CSDL MYSQL
+      let priceDisplay = "Miễn phí";
+      const costVal = Number(item.estimated_cost) || 0;
+
+      if (costVal > 0) {
+        priceDisplay = `${costVal.toLocaleString('vi-VN')} VNĐ`;
+      } else if (item.price && typeof item.price === 'string' && item.price.toLowerCase() !== 'free') {
+        priceDisplay = item.price;
+      }
+
+      // Màu sắc badge giá: Miễn phí màu xanh ngọc, có phí màu vàng đồng
+      const isFree = costVal === 0;
+      const priceBadgeClass = isFree ? "text-emerald-400 bg-emerald-950/60 border-emerald-500/30" : "text-amber-300 bg-amber-950/60 border-amber-500/30";
+
+      return `
+        <div class="demo-style-card" onclick="openModalById(${item.id})">
+          <img src="${imgPath}" class="card-bg-img" alt="${item.name}">
+          <div class="card-dark-overlay"></div>
+          
+          <div class="position-absolute top-0 start-0 m-3 badge rounded-pill px-3 py-1 shadow-sm fw-bold text-white ${badgeBg}" style="font-size: 11px;">
+            ${badgeText}
+          </div>
+
+          <button data-dest-id="${item.id}" class="btn-favorite-heart ${isFav ? 'favorited' : ''}" onclick="toggleFavorite(${item.id}, this, event)" title="Lưu điểm đến yêu thích">
+            <i class="bi ${isFav ? 'bi-heart-fill' : 'bi-heart'}"></i>
+          </button>
+
+          <div class="position-absolute bottom-0 start-0 end-0 p-4 text-white">
+            <div class="d-flex align-items-center gap-1.5 mb-1">
+              <span class="text-amber-400" style="font-size: 11px;">★ ${(Number(item.rating) || 5.0).toFixed(1)}</span>
+              <span class="text-white text-opacity-50" style="font-size: 11px;">•</span>
+              <span class="text-white text-opacity-75 small text-truncate" style="font-size: 11px;">${item.district || 'Trung tâm'}, ${item.city || 'Việt Nam'}</span>
+            </div>
+
+            <h5 class="fw-bold mb-1 text-truncate" style="font-size: 17px;">${item.name}</h5>
+            
+            <p class="small text-white text-opacity-75 mb-3" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; font-size: 12px; line-height: 1.4;">
+              ${item.short_description || item.description || 'Điểm đến độc đáo với nhiều trải nghiệm hấp dẫn...'}
+            </p>
+            
+            <!-- HIỂN THỊ GIÁ CSDL TẠI ĐÂY -->
+            <div class="d-flex justify-content-between align-items-center pt-2 border-top border-white border-opacity-25">
+              <div class="d-flex align-items-center gap-1">
+                <span class="px-2.5 py-1 rounded-pill border fw-bold" style="font-size: 11.5px; ${isFree ? 'background: rgba(6,78,59,0.7); color: #6ffbbe; border-color: rgba(110,251,190,0.3);' : 'background: rgba(120,53,15,0.7); color: #fde68a; border-color: rgba(253,230,138,0.3);'}">
+                  <i class="bi ${isFree ? 'bi-tag-fill' : 'bi-cash-stack'} me-1"></i>${priceDisplay}
+                </span>
+              </div>
+
+              <button class="card-btn-arrow" onclick="event.stopPropagation(); openModalById(${item.id})" title="Xem chi tiết">
+                <i class="bi bi-arrow-up-right fw-bold" style="font-size: 15px;"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    async function loadDatabaseDestinations() {
+      const scrollContainer = document.getElementById('destinations-scroll');
+      const gridContainer = document.getElementById('popular-grid');
+      const savedSurvey = JSON.parse(localStorage.getItem('user_survey_profile') || 'null');
+
+      // 1. NẠP KHỐI ĐIỂM ĐẾN NỔI BẬT / GỢI Ý AI
+      let destinationsData = [];
+      try {
+        if (savedSurvey && savedSurvey.experiences && savedSurvey.experiences.length > 0) {
+          const interestsStr = savedSurvey.experiences.join(',');
+          const budgetStr = savedSurvey.budget || 'Medium';
+          const user = JSON.parse(localStorage.getItem('user') || '{}');
+
+          const aiRes = await fetch(`${API_BASE}/recommendations?user_id=${user.id || 1}&interests=${encodeURIComponent(interestsStr)}&budget=${encodeURIComponent(budgetStr)}&weather=${window.currentWeatherTheme || 'sunny'}&limit=8`);
+          if (aiRes.ok) {
+            const data = await aiRes.json();
+            if (Array.isArray(data) && data.length > 0) {
+              destinationsData = data;
+              document.getElementById('featured-section-title').innerText = "Điểm Đến AI Đề Xuất Cho Bạn";
+              document.getElementById('featured-section-subtitle').innerText = `Dựa trên sở thích: ${savedSurvey.experiences.slice(0, 3).join(', ')}...`;
+            }
+          }
+        }
+      } catch (err) {
+        console.warn("Chưa tải được gợi ý AI, chuyển sang nạp điểm đến nổi bật:", err);
+      }
+
+      // Nếu chưa có khảo sát hoặc API AI đang xử lý, nạp danh sách nổi bật từ CSDL
+      if (!destinationsData || destinationsData.length === 0) {
+        try {
+          const featRes = await fetch(`${API_BASE}/destinations/featured?limit=8`);
+          if (featRes.ok) {
+            destinationsData = await featRes.json();
+          } else {
+            // Dự phòng lần cuối: gọi API lấy toàn bộ điểm đến
+            const allRes = await fetch(`${API_BASE}/destinations?limit=8`);
+            if (allRes.ok) {
+              const allData = await allRes.json();
+              destinationsData = Array.isArray(allData) ? allData : (allData.items || []);
+            }
+          }
+        } catch (e) {
+          console.error("Lỗi nạp điểm nổi bật:", e);
+        }
+      }
+
+      // Render danh sách lên giao diện
+      if (scrollContainer) {
+        if (destinationsData && destinationsData.length > 0) {
+          scrollContainer.innerHTML = destinationsData.map((item, idx) => {
+            const badge = idx === 0 ? "🔥 #1 Yêu thích nhất" : `⚡ Đề cử #${idx + 1}`;
+            const badgeColor = idx === 0 ? "bg-danger" : "bg-success";
+            return renderDemoStyleCard(item, idx, badge, badgeColor);
+          }).join('');
+        } else {
+          scrollContainer.innerHTML = `<p class="w-100 text-center py-4 text-muted small">Chưa có dữ liệu điểm đến.</p>`;
+        }
+      }
+
+      // 2. NẠP KHỐI PHỔ BIẾN & THỊNH HÀNH
+      try {
+        const popRes = await fetch(`${API_BASE}/destinations/popular?limit=4`);
+        if (popRes.ok) {
+          const popData = await popRes.json();
+          if (gridContainer && Array.isArray(popData) && popData.length > 0) {
+            gridContainer.innerHTML = popData.map((item, idx) => {
+              const badge = idx === 0 ? "🔥 #1 Xu hướng tuần" : `📈 #${idx + 1} Thịnh hành`;
+              const badgeColor = idx === 0 ? "bg-danger" : "bg-warning text-dark";
+              return `
+                <div class="col-12 col-sm-6 col-lg-3">
+                  ${renderDemoStyleCard(item, idx + 4, badge, badgeColor)}
+                </div>
+              `;
+            }).join('');
+          }
+        }
+      } catch (err) {
+        console.error("Lỗi nạp danh sách phổ biến:", err);
+      }
+    }
+    /* ===================================================
+       QUẢN LÝ CHỌN THÔNG SỐ VÀ TỰ ĐỘNG TẠO LỊCH TRÌNH TỪ INDEX
+       =================================================== */
+    let selectedHeroCityName = 'Đà Nẵng';
+    let selectedHeroCityParam = 'Đà Nẵng';
+    let selectedHeroDays = 3;
+    let selectedHeroDurationText = '3 Ngày 2 Đêm';
+    let selectedHeroBudget = 'Tiêu chuẩn';
+    let selectedHeroInterests = ['Nghỉ dưỡng', 'Ẩm thực'];
+    let selectedHeroInterestLabel = 'Nghỉ Dưỡng & Ẩm Thực';
+    let isUsingSurvey = false;
+
+    function selectHeroCity(displayName, paramCode, element) {
+      selectedHeroCityName = displayName;
+      selectedHeroCityParam = paramCode || displayName;
+      const valEl = document.getElementById('hero-dest-val');
+      if (valEl) valEl.innerText = displayName;
+
+      if (element) {
+        element.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(el => el.classList.remove('active'));
+        element.classList.add('active');
+      }
+      updateHeroSummary();
+    }
+
+    function selectHeroDuration(days, durationText, element) {
+      selectedHeroDays = days;
+      selectedHeroDurationText = durationText;
+      const valEl = document.getElementById('hero-duration-val');
+      if (valEl) valEl.innerText = durationText;
+
+      if (element) {
+        element.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(el => el.classList.remove('active'));
+        element.classList.add('active');
+      }
+      updateHeroSummary();
+    }
+
+    function selectHeroBudget(budget, element) {
+      selectedHeroBudget = budget;
+      const valEl = document.getElementById('hero-budget-val');
+      if (valEl) valEl.innerText = budget;
+
+      if (element) {
+        element.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(el => el.classList.remove('active'));
+        element.classList.add('active');
+      }
+      updateHeroSummary();
+    }
+
+    function selectHeroInterest(interestList, labelText, element, isFromSurvey = false) {
+      selectedHeroInterests = Array.isArray(interestList) ? interestList : [interestList];
+      selectedHeroInterestLabel = labelText;
+      isUsingSurvey = isFromSurvey;
+
+      const valEl = document.getElementById('hero-interest-val');
+      if (valEl) valEl.innerText = labelText;
+
+      const badgeEl = document.getElementById('hero-survey-badge');
+      if (badgeEl) {
+        badgeEl.style.display = isFromSurvey ? 'inline-block' : 'none';
+      }
+
+      if (element) {
+        element.closest('.dropdown-menu').querySelectorAll('.dropdown-item').forEach(el => el.classList.remove('active'));
+        element.classList.add('active');
+      }
+      updateHeroSummary();
+    }
+
+    function updateHeroSummary() {
+      const summaryEl = document.getElementById('hero-cta-summary');
+      if (summaryEl) {
+        summaryEl.innerHTML = `Lộ trình AI: <strong>${selectedHeroCityName}</strong> • <strong>${selectedHeroDurationText}</strong> • <strong>${selectedHeroInterestLabel}</strong>`;
+      }
+    }
+
+    function syncHeroWithSurvey() {
+      const surveyStr = localStorage.getItem('user_survey_profile');
+      let survey = null;
+      if (surveyStr) {
+        try { survey = JSON.parse(surveyStr); } catch(e) {}
+      }
+
+      const badgeEl = document.getElementById('hero-survey-badge');
+
+      if (survey && survey.experiences && survey.experiences.length > 0) {
+        // Đã có khảo sát: Tự động lấy sở thích theo khảo sát
+        selectedHeroInterests = [...survey.experiences];
+        selectedHeroInterestLabel = survey.experiences.slice(0, 2).join(' & ');
+        isUsingSurvey = true;
+
+        const valEl = document.getElementById('hero-interest-val');
+        if (valEl) valEl.innerText = selectedHeroInterestLabel;
+
+        if (badgeEl) badgeEl.style.display = 'inline-block';
+
+        if (survey.budget) {
+          selectedHeroBudget = survey.budget;
+          const bEl = document.getElementById('hero-budget-val');
+          if (bEl) bEl.innerText = survey.budget;
+        }
+      } else {
+        // Chưa có khảo sát: Cho phép người dùng tự do chọn sở thích
+        isUsingSurvey = false;
+        if (badgeEl) badgeEl.style.display = 'none';
+      }
+
+      renderHeroInterestDropdown();
+      updateHeroSummary();
+    }
+
+    function renderHeroInterestDropdown() {
+      const container = document.getElementById('hero-interest-dropdown');
+      if (!container) return;
+
+      const surveyStr = localStorage.getItem('user_survey_profile');
+      let survey = null;
+      if (surveyStr) {
+        try { survey = JSON.parse(surveyStr); } catch(e) {}
+      }
+
+      const hasSurvey = survey && survey.experiences && survey.experiences.length > 0;
+      let html = '';
+
+      if (hasSurvey) {
+        const surveyExpText = survey.experiences.join(', ');
+        const shortText = survey.experiences.slice(0, 2).join(' & ');
+        const isSurveyActive = isUsingSurvey ? 'active' : '';
+
+        html += `
+          <li class="dropdown-header text-uppercase fw-bold text-success px-2 py-1 d-flex align-items-center justify-content-between" style="font-size: 10px;">
+            <span>🎯 ĐÃ CÓ KHẢO SÁT CỦA BẠN</span>
+            <span class="badge bg-success text-white" style="font-size: 8px;">Khuyên dùng</span>
+          </li>
+          <li>
+            <a class="dropdown-item rounded-3 py-2 fw-bold text-success ${isSurveyActive}" href="javascript:void(0)" onclick='selectHeroInterest(${JSON.stringify(survey.experiences)}, "${shortText}", this, true)'>
+              <div class="d-flex align-items-center gap-2">
+                <span>✨</span>
+                <div>
+                  <div class="fw-bold">Theo khảo sát của bạn</div>
+                  <div class="text-muted fw-normal" style="font-size: 11px;">${surveyExpText}</div>
+                </div>
+              </div>
+            </a>
+          </li>
+          <li><hr class="dropdown-divider my-1"></li>
+          <li class="dropdown-header text-uppercase fw-bold text-muted px-2 py-1" style="font-size: 10px;">Hoặc chọn phong cách khác:</li>
+        `;
+      } else {
+        html += `
+          <li class="dropdown-header text-uppercase fw-bold text-muted px-2 py-1" style="font-size: 10px;">Chọn Phong Cách Bạn Thích</li>
+        `;
+      }
+
+      const presets = [
+        { title: "Nghỉ Dưỡng & Ẩm Thực", list: ["Nghỉ dưỡng", "Ẩm thực"], icon: "🏖️" },
+        { title: "Văn Hóa & Di Sản", list: ["Văn hóa & Di sản", "Ẩm thực"], icon: "🏛️" },
+        { title: "Biển Đảo & Nghỉ Mát", list: ["Biển đảo", "Nghỉ dưỡng"], icon: "🌊" },
+        { title: "Thiên Nhiên & Sinh Thái", list: ["Thiên nhiên", "Nghỉ dưỡng"], icon: "🌲" },
+        { title: "Check-in & Sống Ảo", list: ["Check-in & Sống ảo", "Ẩm thực"], icon: "📸" },
+        { title: "Mạo Hiểm & Khám Phá", list: ["Mạo hiểm", "Thiên nhiên"], icon: "🧗" }
+      ];
+
+      presets.forEach(p => {
+        const isActive = !isUsingSurvey && selectedHeroInterestLabel === p.title ? 'active' : '';
+        html += `
+          <li>
+            <a class="dropdown-item rounded-3 py-2 fw-semibold ${isActive}" href="javascript:void(0)" onclick='selectHeroInterest(${JSON.stringify(p.list)}, "${p.title}", this, false)'>
+              ${p.icon} ${p.title}
+            </a>
+          </li>
+        `;
+      });
+
+      html += `
+        <li><hr class="dropdown-divider my-1"></li>
+        <li>
+          <a class="dropdown-item rounded-3 py-2 text-success fw-bold d-flex align-items-center gap-2" href="javascript:void(0)" onclick="openSurveyModal()">
+            <i class="bi bi-ui-checks-grid"></i>
+            <span>${hasSurvey ? 'Làm lại khảo sát AI' : 'Làm khảo sát AI (1 phút) ⚡'}</span>
+          </a>
+        </li>
+      `;
+
+      container.innerHTML = html;
+    }
+
+    function startAutoTripPlanner() {
+      const btn = document.getElementById('btn-auto-create-trip');
+      if (btn) {
+        btn.innerHTML = `<span class="spinner-border spinner-border-sm me-2" role="status"></span><span>Đang tạo lộ trình...</span>`;
+        btn.disabled = true;
+      }
+
+      const tripPayload = {
+        city: selectedHeroCityParam,
+        cityName: selectedHeroCityName,
+        days: selectedHeroDays,
+        budget: selectedHeroBudget,
+        interests: selectedHeroInterests,
+        durationText: selectedHeroDurationText,
+        auto_generate: true,
+        timestamp: Date.now()
+      };
+
+      localStorage.setItem('pending_auto_trip', JSON.stringify(tripPayload));
+
+      const params = new URLSearchParams({
+        auto_generate: '1',
+        city: selectedHeroCityParam,
+        days: String(selectedHeroDays),
+        budget: selectedHeroBudget,
+        interests: selectedHeroInterests.join(',')
+      });
+
+      window.location.href = `trip-planner.html?${params.toString()}`;
+    }
+
+    function focusSearch() { 
+      const destVal = document.getElementById('hero-dest-val');
+      if (destVal) destVal.click(); 
+    }
+
+    function scrollDestinations(amount) {
+      const container = document.getElementById('destinations-scroll');
+      if (container) container.scrollBy({ left: amount, behavior: 'smooth' });
+    }
+
+    async function applyPreset(dest, duration, vibe) {
+      document.getElementById('input-destination').innerText = dest;
+      document.getElementById('input-duration').innerText = duration;
+      document.getElementById('input-vibe').innerText = vibe;
+
+      const scrollContainer = document.getElementById('destinations-scroll');
+      scrollContainer.innerHTML = `
+        <div class="w-100 text-center py-5 text-muted">
+          <div class="spinner-border text-success spinner-border-sm mb-2" role="status"></div>
+          <p class="small mb-0">AI đang lọc danh sách theo "${vibe}"...</p>
+        </div>
+      `;
+
+      try {
+        const res = await fetch(`${API_BASE}/recommendations?interests=${encodeURIComponent(vibe)}&budget=Medium&weather=${window.currentWeatherTheme}&limit=8`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.length > 0) {
+            scrollContainer.innerHTML = data.map((item, idx) => renderDemoStyleCard(item, idx, "⚡ AI Gợi ý", "bg-success")).join('');
+          }
+        }
+      } catch (err) {}
+    }
+
+    function generateRaindrops() {
+      const container = document.getElementById('rain-particles');
+      if (!container) return;
+      container.innerHTML = '';
+      for (let i = 0; i < 45; i++) {
+        const drop = document.createElement('div');
+        drop.className = 'rain-drop';
+        drop.style.left = `${Math.random() * 100}%`;
+        drop.style.animationDuration = `${0.6 + Math.random() * 0.5}s`;
+        drop.style.animationDelay = `${Math.random() * 2}s`;
+        container.appendChild(drop);
+      }
+    }
+
+    async function changeWeatherLocation(cityKey, btnElement) {
+      currentCityKey = cityKey;
+
+      // 1. Cập nhật giao diện nút tab đang active
+      if (btnElement) {
+        document.querySelectorAll('.weather-tab-btn').forEach(btn => {
+          btn.classList.remove('active', 'text-white');
+          btn.classList.add('btn-white', 'text-secondary');
+          btn.style.backgroundColor = '';
+        });
+        btnElement.classList.add('active', 'text-white');
+        btnElement.classList.remove('btn-white', 'text-secondary');
+        btnElement.style.backgroundColor = 'var(--emerald-800)';
+      }
+
+      // 2. Gọi API lấy thời tiết thực tế
+      try {
+        const res = await fetch(`${API_BASE}/weather?city=${cityKey}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.location) {
+            const card = document.getElementById('weather-card');
+            const sunFlare = document.getElementById('sun-flare-effect');
+
+            document.getElementById('weather-location').innerText = data.location;
+            document.getElementById('weather-temp').innerText = data.temp;
+            document.getElementById('weather-condition').innerText = data.condition;
+            document.getElementById('weather-range').innerText = data.range;
+            document.getElementById('weather-summary-text').innerText = data.summary;
+
+            // Đổi hiệu ứng Theme (Nắng / Mưa / Đêm)
+            if (data.theme === 'theme-rainy') {
+              card.className = "weather-card-box theme-rainy shadow-lg";
+              if (sunFlare) sunFlare.style.display = "none";
+              generateRaindrops();
+              window.currentWeatherTheme = "rainy";
+            } else if (data.theme === 'theme-night') {
+              card.className = "weather-card-box theme-night shadow-lg";
+              if (sunFlare) sunFlare.style.display = "none";
+              const rainBox = document.getElementById('rain-particles');
+              if (rainBox) rainBox.innerHTML = '';
+              window.currentWeatherTheme = "cool";
+            } else {
+              card.className = "weather-card-box theme-sunny shadow-lg";
+              if (sunFlare) sunFlare.style.display = "block";
+              const rainBox = document.getElementById('rain-particles');
+              if (rainBox) rainBox.innerHTML = '';
+              window.currentWeatherTheme = "sunny";
+            }
+
+            // Render theo giờ
+            if (data.hourly && Array.isArray(data.hourly) && data.hourly.length > 0) {
+              document.getElementById('hourly-forecast-list').innerHTML = data.hourly.map(item => `
+                <div class="ios-hourly-item ${item.is_now ? 'text-warning' : ''}">
+                  <span class="${item.is_now ? 'text-white fw-bold' : 'text-white text-opacity-75'}">${item.time}</span>
+                  <span class="fs-5">${item.icon}</span>
+                  <span class="${item.is_now ? 'fw-bold' : ''}">${item.temp}</span>
+                </div>
+              `).join('');
+            }
+
+            // Render 7 ngày
+            if (data.daily && Array.isArray(data.daily) && data.daily.length > 0) {
+              document.getElementById('daily-forecast-list').innerHTML = data.daily.map((item, idx) => `
+                <div class="d-flex align-items-center justify-content-between py-2 ${idx !== data.daily.length - 1 ? 'border-bottom border-white border-opacity-10' : ''} small fw-bold">
+                  <span style="width: 70px;">${item.day}</span>
+                  <div style="width: 40px; text-align: center;">${item.icon}</div>
+                  <span style="width: 35px; text-align: right;" class="text-white text-opacity-75">${item.temp_min}</span>
+                  <div class="temp-bar-bg mx-3"><div class="temp-bar-fill"></div></div>
+                  <span style="width: 35px; text-align: left;">${item.temp_max}</span>
+                </div>
+              `).join('');
+            }
+          }
+        }
+      } catch (err) {
+        console.warn("Lỗi cập nhật thời tiết:", err);
+      }
+
+      // 3. Đồng bộ chuyển đổi bản đồ và địa điểm xung quanh theo tỉnh đó
+      loadNearbyByCity(cityKey);
+    }
+
+    function initNearbyMap() {
+      const city = CITY_QUERY_MAP[currentCityKey] || CITY_QUERY_MAP.danang;
+
+      if (!nearbyMap) {
+        nearbyMap = L.map('nearby-leaflet-map', {
+          zoomControl: false,
+          attributionControl: false
+        }).setView([city.lat, city.lon], 13);
+
+        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
+          maxZoom: 19
+        }).addTo(nearbyMap);
+
+        markersLayer = L.layerGroup().addTo(nearbyMap);
+
+        const userIcon = L.divIcon({
+          className: 'user-pin',
+          html: `
+            <div style="background: #047857; color: #fff; border: 2px solid #fff; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
+              <i class="bi bi-geo-alt-fill" style="font-size: 15px;"></i>
+            </div>
+          `,
+          iconSize: [30, 30],
+          iconAnchor: [15, 15]
+        });
+
+        userMarker = L.marker([city.lat, city.lon], { icon: userIcon }).addTo(nearbyMap);
+      }
+
+      setTimeout(() => { if (nearbyMap) nearbyMap.invalidateSize(); }, 300);
+      loadNearbyByCity(currentCityKey);
+    }
+
+    async function loadNearbyByCity(cityKey) {
+      const city = CITY_QUERY_MAP[cityKey] || CITY_QUERY_MAP.danang;
+      
+      const locationLabel = document.getElementById('nearby-current-city-label');
+      if (locationLabel) {
+        locationLabel.innerHTML = `<i class="bi bi-geo-alt-fill"></i> VỊ TRÍ HIỆN TẠI: ${city.name.toUpperCase()}`;
+      }
+
+      if (nearbyMap) {
+        nearbyMap.flyTo([city.lat, city.lon], 13, { duration: 1.0 });
+        if (userMarker) userMarker.setLatLng([city.lat, city.lon]);
+        setTimeout(() => nearbyMap.invalidateSize(), 300);
+      }
+
+      try {
+        const res = await fetch(`${API_BASE}/destinations/nearby?lat=${city.lat}&lon=${city.lon}&radius_km=60&city=${encodeURIComponent(city.cityDb)}&limit=4`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.length > 0) {
+            renderNearbyUI(data);
+            renderMapMarkers(data);
+          }
+        }
+      } catch (err) {}
+    }
+
+    let currentNearbyPlaces = [];
+
+    function renderNearbyUI(places) {
+      currentNearbyPlaces = places || [];
+      const listContainer = document.getElementById('nearby-places-list');
+      if (!listContainer) return;
+
+      listContainer.innerHTML = places.map((item, idx) => {
+        const img = resolveLocalImage(item, idx);
+        const btnStyle = idx === 0 ? "btn-direction-dark" : "btn-direction-light";
+
+        // Khai báo an toàn item.lat và item.lon
+        const itemLat = parseFloat(item.lat) || 16.0544;
+        const itemLon = parseFloat(item.lon) || 108.2022;
+
+        return `
+          <div class="nearby-item-card" onclick="focusMarker(${itemLat}, ${itemLon})">
+            <img src="${img}" class="nearby-thumb" alt="${item.name}">
+            <div class="flex-grow-1 min-w-0">
+              <div class="d-flex align-items-center gap-2 mb-1">
+                <span class="badge rounded-pill px-2 py-0 fw-bold" style="background: #ccfbf1; color: #0f766e; font-size: 11px;">${item.distance_label}</span>
+                <span class="text-muted" style="font-size: 12px;">${item.time_open}</span>
+              </div>
+              <h6 class="fw-bold mb-1 text-truncate text-dark">${item.name}</h6>
+              <p class="text-muted small mb-0 text-truncate" style="font-size: 12px;">${item.desc}</p>
+            </div>
+            <!-- Dùng đúng itemLat và itemLon -->
+            <button type="button" class="${btnStyle} text-decoration-none border-0 cursor-pointer" onclick="openNearbyDirections(${idx}, event)">
+              <i class="bi bi-cursor-fill"></i> Chỉ đường
+            </button>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function openNearbyDirections(idx, event) {
+      if (event) event.stopPropagation();
+      const item = currentNearbyPlaces[idx];
+      if (!item) return;
+      const itemLat = parseFloat(item.lat) || 16.0544;
+      const itemLon = parseFloat(item.lon) || 108.2022;
+      window.openGoogleDirectionsModal({
+        destLat: itemLat,
+        destLon: itemLon,
+        destName: item.name || 'Địa điểm du lịch',
+        destAddress: item.desc || ''
+      });
+    }
+
+    function renderMapMarkers(places) {
+      if (!markersLayer) return;
+      markersLayer.clearLayers();
+
+      places.forEach(item => {
+        const placeIcon = L.divIcon({
+          className: 'place-pin',
+          html: `<div style="background: #0284c7; color: #fff; border: 2px solid #fff; border-radius: 50%; width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.25);"><i class="bi bi-geo-alt-fill" style="font-size: 13px;"></i></div>`,
+          iconSize: [26, 26],
+          iconAnchor: [13, 13]
+        });
+
+        const marker = L.marker([item.lat, item.lon], { icon: placeIcon });
+        marker.bindPopup(`<b>${item.name}</b><br><small>Cách bạn: ${item.distance_label}</small>`);
+        markersLayer.addLayer(marker);
+      });
+    }
+
+    function focusMarker(lat, lon) {
+      if (nearbyMap) nearbyMap.flyTo([lat, lon], 15, { duration: 1.0 });
+    }
+
+    function filterNearby(cat, btn) {
+      document.querySelectorAll('.nearby-filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      loadNearbyByCity(currentCityKey);
+    }
+
+    function checkUserSession() {
+      const userStr = localStorage.getItem('user');
+      const userArea = document.getElementById('nav-user-area');
+      const surveyBtn = document.getElementById('btn-floating-survey');
+
+      if (userStr) {
+        try {
+          const user = JSON.parse(userStr);
+          const displayName = user.full_name || user.name || (user.email ? user.email.split('@')[0] : 'Người dùng');
+          const firstChar = displayName.charAt(0).toUpperCase();
+
+          if (userArea) {
+            userArea.innerHTML = `
+              <div class="dropdown">
+                <div class="user-profile-btn" data-bs-toggle="dropdown" aria-expanded="false">
+                  <div class="user-avatar-circle">${firstChar}</div>
+                  <div class="text-start d-none d-sm-block">
+                    <span class="d-block text-dark fw-bold" style="font-size: 12px; line-height: 1.2;">${displayName}</span>
+                    <span class="d-block text-muted" style="font-size: 10px;">Thành viên</span>
+                  </div>
+                  <i class="bi bi-chevron-down text-muted" style="font-size: 11px;"></i>
+                </div>
+
+                <ul class="dropdown-menu dropdown-menu-end user-dropdown-menu mt-2">
+                  <li class="px-3 py-2 border-bottom mb-1">
+                    <span class="d-block small text-muted" style="font-size: 11px;">Đã đăng nhập bằng</span>
+                    <span class="d-block small fw-bold text-dark text-truncate" style="max-width: 170px;">${user.email || ''}</span>
+                  </li>
+                  <li>
+                    <button class="dropdown-item text-success fw-bold" onclick="openSurveyModal()">
+                      <i class="bi bi-stars me-2"></i>Khảo sát sở thích AI
+                    </button>
+                  </li>
+                  <li><hr class="dropdown-divider my-1"></li>
+                  <li>
+                    <button class="dropdown-item text-danger" onclick="logout()">
+                      <i class="bi bi-box-arrow-right me-2"></i>Đăng xuất
+                    </button>
+                  </li>
+                </ul>
+              </div>
+            `;
+          }
+
+          if (surveyBtn) {
+            surveyBtn.style.display = 'flex';
+          }
+        } catch (e) {}
+      } else {
+        if (surveyBtn) {
+          surveyBtn.style.display = 'none';
+        }
+      }
+    }
+
+  
+
+    function logout() {
+      localStorage.removeItem('user');
+      localStorage.removeItem('token');
+      localStorage.removeItem('user_survey_profile');
+      window.location.reload();
+    }
+
+    let currentSurveyStep = 1;
+    const totalSurveySteps = 4;
+
+    const surveyData = {
+      experiences: [],
+      companion: '',
+      budget: '',
+      pace: ''
+    };
+
+    const surveyStepsConfig = {
+      1: {
+        title: "🏖 Bạn thích loại hình trải nghiệm nào?",
+        subtitle: "Chọn các chủ đề bạn yêu thích nhất để AI gợi ý đúng gu nhé.",
+        type: "multi",
+        options: [
+          { id: "Biển đảo", icon: "🏖️", title: "Biển đảo", desc: "Nghỉ dưỡng ven biển, lặn ngắm san hô" },
+          { id: "Thiên nhiên", icon: "🌲", title: "Thiên nhiên", desc: "Vườn quốc gia, thác nước hoang sơ" },
+          { id: "Văn hóa & Di sản", icon: "🏛️", title: "Văn hóa & Di sản", desc: "Bảo tàng lịch sử, phố cổ, đền đài" },
+          { id: "Ẩm thực", icon: "🍜", title: "Ẩm thực", desc: "Đặc sản vùng miền, street food" },
+          { id: "Mua sắm", icon: "🛍️", title: "Mua sắm", desc: "Chợ đêm truyền thống, trung tâm thương mại" },
+          { id: "Mạo hiểm", icon: "🧗", title: "Mạo hiểm", desc: "Trekking cắm trại, chèo SUP, dù lượn" },
+          { id: "Check-in & Sống ảo", icon: "📸", title: "Check-in & Sống ảo", desc: "Quán cà phê view đẹp, góc chụp ảnh xịn" },
+          { id: "Nghỉ dưỡng", icon: "🧘", title: "Nghỉ dưỡng", desc: "Spa thư giãn, suối khoáng nóng" },
+          { id: "Giải trí & Nightlife", icon: "🎮", title: "Giải trí & Nightlife", desc: "Công viên chủ đề, beer club, phố đi bộ" }
+        ]
+      },
+      2: {
+        title: "👥 Bạn thường đi du lịch cùng ai?",
+        subtitle: "AI sẽ tùy chỉnh danh sách điểm đến phù hợp với nhóm đi cùng.",
+        type: "single",
+        options: [
+          { id: "Solo", icon: "🧘", title: "Đi một mình (Solo)", desc: "Tự do khám phá, lịch trình linh hoạt" },
+          { id: "Cặp đôi", icon: "👩‍❤️‍👨", title: "Cặp đôi / Người yêu", desc: "Không gian lãng mạn, riêng tư, ấm cúng" },
+          { id: "Gia đình", icon: "👨‍👩‍👧‍👦", title: "Gia đình", desc: "Thích hợp cho trẻ nhỏ và người lớn tuổi" },
+          { id: "Nhóm bạn", icon: "👥", title: "Nhóm bạn thân", desc: "Sôi động, nhiều hoạt động vui chơi check-in" }
+        ]
+      },
+      3: {
+        title: "💰 Ngân sách trung bình cho chuyến đi?",
+        subtitle: "Để AI phân bổ địa điểm ăn uống và lưu trú hợp lý.",
+        type: "single",
+        options: [
+          { id: "Tiết kiệm", icon: "🎒", title: "Tiết kiệm", desc: "Homestay, quán ăn bình dân (< 1 triệu/ngày)" },
+          { id: "Tiêu chuẩn", icon: "🏨", title: "Tiêu chuẩn", desc: "Khách sạn 3-4 sao, nhà hàng chất lượng (1 - 3 triệu/ngày)" },
+          { id: "Cao cấp", icon: "💎", title: "Cao cấp / Sang chảnh", desc: "Resort 5 sao, dịch vụ xa xỉ (> 3 triệu/ngày)" }
+        ]
+      },
+      4: {
+        title: "⚡ Nhịp độ chuyến đi mong muốn?",
+        subtitle: "Bạn muốn đi chơi dồn dập hay nghỉ ngơi thong thả?",
+        type: "single",
+        options: [
+          { id: "Thong thả", icon: "☕", title: "Thong thả & Thư giãn", desc: "Ít điểm đến, thời gian nghỉ ngơi thoải mái" },
+          { id: "Cân bằng", icon: "⚖️", title: "Cân bằng & Vừa sức", desc: "Kết hợp hài hòa giữa tham quan và nghỉ ngơi" },
+          { id: "Dày đặc", icon: "🚀", title: "Dày đặc & Khám phá", desc: "Tối đa hóa điểm đến, trải nghiệm tối đa" }
+        ]
+      }
+    };
+
+    function openSurveyModal() {
+      const existing = JSON.parse(localStorage.getItem('user_survey_profile'));
+      if (existing) {
+        surveyData.experiences = existing.experiences || [];
+        surveyData.companion = existing.companion || '';
+        surveyData.budget = existing.budget || '';
+        surveyData.pace = existing.pace || '';
+      }
+      currentSurveyStep = 1;
+      renderSurveyStep();
+      document.getElementById('survey-modal-backdrop').classList.add('active');
+    }
+
+    function closeSurveyModal() {
+      document.getElementById('survey-modal-backdrop').classList.remove('active');
+    }
+
+    document.getElementById('survey-modal-backdrop').addEventListener('click', (e) => {
+      if (e.target.id === 'survey-modal-backdrop') closeSurveyModal();
+    });
+
+    function renderSurveyStep() {
+      const config = surveyStepsConfig[currentSurveyStep];
+
+      document.getElementById('survey-progress-bar').style.width = `${(currentSurveyStep / totalSurveySteps) * 100}%`;
+      document.getElementById('survey-step-indicator').innerText = `Bước ${currentSurveyStep}/${totalSurveySteps}`;
+      document.getElementById('survey-question-title').innerText = config.title;
+      document.getElementById('survey-question-subtitle').innerText = config.subtitle;
+      document.getElementById('survey-btn-next-text').innerText = (currentSurveyStep === totalSurveySteps) ? "Hoàn tất & Nhận gợi ý ✨" : "Tiếp tục";
+
+      const badge = document.getElementById('survey-badge-counter');
+      if (currentSurveyStep === 1) {
+        badge.style.display = 'inline-flex';
+        badge.innerText = `Đã chọn: ${surveyData.experiences.length}/9`;
+      } else {
+        badge.style.display = 'none';
+      }
+
+      const container = document.getElementById('survey-options-container');
+      container.innerHTML = '';
+
+      const colClass = config.options.length <= 4 ? "col-sm-6" : "col-sm-6 col-md-4";
+
+      config.options.forEach(opt => {
+        const isSelected = isSurveyOptionSelected(config.type, opt.id);
+        const col = document.createElement('div');
+        col.className = colClass;
+        
+        col.innerHTML = `
+          <div class="survey-option-card ${isSelected ? 'selected' : ''}" onclick="selectSurveyOption('${config.type}', '${opt.id}')">
+            ${isSelected ? '<span class="position-absolute top-0 end-0 m-2 badge bg-success rounded-circle" style="width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:10px;">✓</span>' : ''}
+            <div class="fs-3 mb-1">${opt.icon}</div>
+            <h6 class="fw-bold text-dark mb-1" style="font-size: 14px;">${opt.title}</h6>
+            <p class="text-muted small mb-0" style="font-size: 11px;">${opt.desc}</p>
+          </div>
+        `;
+
+        container.appendChild(col);
+      });
+    }
+
+    function isSurveyOptionSelected(type, id) {
+      if (type === 'multi') return surveyData.experiences.includes(id);
+      if (currentSurveyStep === 2) return surveyData.companion === id;
+      if (currentSurveyStep === 3) return surveyData.budget === id;
+      if (currentSurveyStep === 4) return surveyData.pace === id;
+      return false;
+    }
+
+    function selectSurveyOption(type, id) {
+      if (type === 'multi') {
+        const idx = surveyData.experiences.indexOf(id);
+        if (idx > -1) {
+          surveyData.experiences.splice(idx, 1);
+        } else {
+          surveyData.experiences.push(id);
+        }
+      } else {
+        if (currentSurveyStep === 2) surveyData.companion = id;
+        if (currentSurveyStep === 3) surveyData.budget = id;
+        if (currentSurveyStep === 4) surveyData.pace = id;
+      }
+      renderSurveyStep();
+    }
+
+    function nextSurveyStep() {
+      if (currentSurveyStep < totalSurveySteps) {
+        currentSurveyStep++;
+        renderSurveyStep();
+      } else {
+        localStorage.setItem('user_survey_profile', JSON.stringify(surveyData));
+        closeSurveyModal();
+        syncHeroWithSurvey();
+        loadDatabaseDestinations();
+        document.getElementById('featured').scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+
+    function prevSurveyStep() {
+      if (currentSurveyStep > 1) {
+        currentSurveyStep--;
+        renderSurveyStep();
+      } else {
+        closeSurveyModal();
+      }
+    }
+
+    function skipSurveyQuestion() {
+      if (currentSurveyStep === 1) surveyData.experiences = [];
+      if (currentSurveyStep === 2) surveyData.companion = '';
+      if (currentSurveyStep === 3) surveyData.budget = '';
+      if (currentSurveyStep === 4) surveyData.pace = '';
+      nextSurveyStep();
+    }
+
+    function setActiveNav() {
+      const currentPath = window.location.pathname.split("/").pop() || "index.html";
+      const currentHash = window.location.hash;
+      const navLinks = document.querySelectorAll("#main-nav-links .nav-link-custom");
+
+      navLinks.forEach(link => {
+        link.classList.remove("active");
+        const pageTarget = link.getAttribute("data-page");
+
+        if (currentHash && pageTarget === currentHash) {
+          link.classList.add("active");
+        } else if (!currentHash && (pageTarget === currentPath || (currentPath === "" && pageTarget === "index.html"))) {
+          link.classList.add("active");
+        }
+      });
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      checkUserSession();
+      loadDatabaseDestinations();
+      syncHeroWithSurvey();
+
+      // KÍCH HOẠT THỜI TIẾT THỰC TẾ NGAY KHI VÀO TRANG
+      const activeBtn = document.querySelector('.weather-tab-btn.active');
+      changeWeatherLocation('danang', activeBtn);
+
+      initNearbyMap();
+      setActiveNav();
+      syncFavoritesFromDatabase();
+    });
+    window.addEventListener("hashchange", setActiveNav);
+  </script>
+</body>
+</html>

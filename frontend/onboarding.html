@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Smart Tourism AI - Khảo sát sở thích du lịch</title>
+<!-- Google Fonts: Plus Jakarta Sans -->
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<!-- Tailwind CSS v3 -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+          },
+          colors: {
+            emerald: {
+              50: '#ecfdf5',
+              100: '#d1fae5',
+              200: '#a7f3d0',
+              500: '#10b981',
+              600: '#059669',
+              700: '#047857',
+              800: '#065f46',
+            }
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    body {
+      background-color: #f8fafc;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    .selection-card {
+      transition: all 0.2s ease-in-out;
+    }
+</style>
+</head>
+<body class="min-h-screen text-slate-800 antialiased flex flex-col justify-between relative overflow-x-hidden selection:bg-emerald-100 selection:text-emerald-800">
+
+<!-- Background decorative lighting -->
+<div aria-hidden="true" class="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-96 bg-gradient-to-b from-emerald-100/40 via-teal-50/20 to-transparent blur-3xl pointer-events-none -z-10"></div>
+
+<!-- Top Brand Header -->
+<header class="w-full border-b border-slate-200/80 bg-white/70 backdrop-blur-md sticky top-0 z-30">
+<div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+<a href="index.html" class="flex items-center gap-2.5 group">
+<div class="w-9 h-9 rounded-xl flex items-center justify-center text-white shadow-md group-hover:scale-105 transition-transform" style="background: #355A3C;">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path d="M13 10V3L4 14h7v7l9-11h-7z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</div>
+<div>
+<span class="text-base font-bold text-slate-900 tracking-tight">Smart Tourism <span class="font-extrabold" style="color: #355A3C;">AI</span></span>
+<span class="hidden sm:inline-block ml-2 px-2 py-0.5 text-[10px] font-semibold tracking-wide uppercase bg-emerald-100 text-emerald-800 rounded-full">Onboarding</span>
+</div>
+</a>
+<div class="flex items-center gap-3">
+<span class="text-xs font-medium text-slate-500 hidden sm:inline-flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full animate-pulse" style="background-color: #355A3C;"></span> Trợ lý AI đang hoạt động
+</span>
+<div class="h-4 w-px bg-slate-200 hidden sm:block"></div>
+<button class="text-xs font-semibold text-slate-600 hover:text-slate-900 transition-colors" type="button">Trợ giúp</button>
+</div>
+</div>
+</header>
+
+<!-- Main Onboarding Wizard Container -->
+<main class="flex-grow flex items-center justify-center py-6 px-4 sm:px-6 lg:px-8">
+<section class="w-full max-w-4xl bg-white border border-slate-200/90 rounded-2xl shadow-xl shadow-slate-200/40 overflow-hidden flex flex-col min-h-[580px]">
+
+<!-- Wizard Navigation Header -->
+<nav class="border-b border-slate-100 px-6 py-4 sm:px-8 sm:py-5 bg-slate-50/50 flex flex-wrap items-center justify-between gap-4">
+<div class="flex items-center gap-4 sm:gap-6 flex-1 min-w-[280px]">
+<!-- Back Button -->
+<button id="btn-back" onclick="prevStep()" class="inline-flex items-center gap-2 px-3 py-1.5 text-xs font-semibold text-slate-600 hover:text-emerald-700 bg-white hover:bg-slate-50 border border-slate-200 rounded-lg shadow-sm transition-all focus:outline-none active:scale-95">
+<svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2"></path>
+</svg>
+<span class="hidden sm:inline">Quay lại</span>
+</button>
+
+<!-- Progress Bar -->
+<div class="flex items-center gap-3 flex-1 max-w-xs">
+<div class="w-full bg-slate-200/80 rounded-full h-2.5 overflow-hidden p-0.5">
+<div id="progress-bar" class="h-full rounded-full transition-all duration-300 ease-out" style="width: 25%; background-color: #355A3C;"></div>
+</div>
+<span id="step-indicator" class="text-xs font-bold text-slate-700 whitespace-nowrap bg-slate-100 px-2 py-0.5 rounded-md border border-slate-200/60">
+  Bước 1/4
+</span>
+</div>
+</div>
+
+<div>
+<button onclick="skipQuestion()" class="text-xs font-semibold text-slate-500 hover:text-slate-800 transition-colors px-3 py-1.5 rounded-lg hover:bg-slate-100 border border-transparent hover:border-slate-200">
+  Bỏ qua câu này
+</button>
+</div>
+</nav>
+
+<!-- Content Area -->
+<div class="p-6 sm:p-8 md:p-10 flex flex-col flex-1 justify-between">
+  
+  <!-- Content Header -->
+  <header class="mb-6">
+    <div class="flex flex-wrap items-center justify-between gap-2 mb-1.5">
+      <h1 id="question-title" class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2.5">
+        <!-- JS render -->
+      </h1>
+      <span id="badge-counter" class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">
+        <!-- JS render -->
+      </span>
+    </div>
+    <p id="question-subtitle" class="text-sm sm:text-base text-slate-600 font-medium">
+      <!-- JS render -->
+    </p>
+  </header>
+
+  <!-- Dynamic Grid Cards -->
+  <div id="options-container" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 my-auto">
+    <!-- JS render options dynamically -->
+  </div>
+
+</div>
+
+<!-- Bottom Action Bar -->
+<footer class="border-t border-slate-200 bg-slate-50/80 px-6 py-4 sm:px-8 sm:py-5 flex flex-col sm:flex-row items-center justify-between gap-4">
+<div class="flex items-center gap-2 text-xs text-slate-600 text-center sm:text-left">
+<span class="flex-shrink-0 text-base">💡</span>
+<span>Dữ liệu được đồng bộ vào <strong>User Profile Vector</strong> để AI tối ưu hóa lộ trình.</span>
+</div>
+
+<div class="w-full sm:w-auto flex justify-end">
+<button id="btn-next" onclick="nextStep()" class="group w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-7 py-3 rounded-xl text-white font-bold text-sm tracking-wide shadow-md transition-all duration-200 transform hover:-translate-y-0.5" style="background-color: #355A3C;">
+<span id="btn-next-text">Tiếp tục</span>
+<!-- SVG Mũi tên chuẩn -->
+<svg class="w-4 h-4 transition-transform group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+</svg>
+</button>
+</div>
+</footer>
+
+</section>
+</main>
+
+<footer class="w-full py-4 text-center text-xs text-slate-400">
+<p>© 2025 Smart Tourism AI Platform. Được bảo mật theo tiêu chuẩn AI Travel Profile.</p>
+</footer>
+
+<!-- Wizard Controller JavaScript -->
+<script>
+  let currentStep = 1;
+  const totalSteps = 4;
+
+  // Dữ liệu lựa chọn người dùng
+  const surveyData = {
+    experiences: [], // Bước 1 (Nhiều lựa chọn)
+    companion: '',    // Bước 2 (1 lựa chọn)
+    budget: '',       // Bước 3 (1 lựa chọn)
+    pace: ''          // Bước 4 (1 lựa chọn)
+  };
+
+  // Cấu hình nội dung 4 bước
+  const stepsConfig = {
+    1: {
+      title: "🏖 Bạn thích loại hình trải nghiệm nào?",
+      subtitle: "Chọn các chủ đề bạn yêu thích nhất để AI gợi ý đúng gu nhé.",
+      type: "multi",
+      options: [
+        { id: "Biển đảo", icon: "🏖️", title: "Biển đảo", desc: "Nghỉ dưỡng ven biển, lặn ngắm san hô" },
+        { id: "Thiên nhiên", icon: "🌲", title: "Thiên nhiên", desc: "Vườn quốc gia, thác nước hoang sơ" },
+        { id: "Văn hóa & Di sản", icon: "🏛️", title: "Văn hóa & Di sản", desc: "Bảo tàng lịch sử, phố cổ, đền đài" },
+        { id: "Ẩm thực", icon: "🍜", title: "Ẩm thực", desc: "Đặc sản vùng miền, street food" },
+        { id: "Mua sắm", icon: "🛍️", title: "Mua sắm", desc: "Chợ đêm truyền thống, trung tâm thương mại" },
+        { id: "Mạo hiểm", icon: "🧗", title: "Mạo hiểm", desc: "Trekking cắm trại, chèo SUP, dù lượn" },
+        { id: "Check-in & Sống ảo", icon: "📸", title: "Check-in & Sống ảo", desc: "Quán cà phê view đẹp, góc chụp ảnh xịn" },
+        { id: "Nghỉ dưỡng", icon: "🧘", title: "Nghỉ dưỡng", desc: "Spa thư giãn, suối khoáng nóng" },
+        { id: "Giải trí & Nightlife", icon: "🎮", title: "Giải trí & Nightlife", desc: "Công viên chủ đề, beer club, phố đi bộ" }
+      ]
+    },
+    2: {
+      title: "👥 Bạn thường đi du lịch cùng ai?",
+      subtitle: "AI sẽ tùy chỉnh danh sách điểm đến phù hợp với nhóm đi cùng.",
+      type: "single",
+      options: [
+        { id: "Solo", icon: "🧘", title: "Đi một mình (Solo)", desc: "Tự do khám phá, lịch trình linh hoạt" },
+        { id: "Cặp đôi", icon: "👩‍❤️‍👨", title: "Cặp đôi / Người yêu", desc: "Không gian lãng mạn, riêng tư, ấm cúng" },
+        { id: "Gia đình", icon: "👨‍👩‍👧‍👦", title: "Gia đình", desc: "Thích hợp cho trẻ nhỏ và người lớn tuổi" },
+        { id: "Nhóm bạn", icon: "👥", title: "Nhóm bạn thân", desc: "Sôi động, nhiều hoạt động vui chơi check-in" }
+      ]
+    },
+    3: {
+      title: "💰 Ngân sách trung bình cho chuyến đi?",
+      subtitle: "Để AI phân bổ địa điểm ăn uống và lưu trú hợp lý.",
+      type: "single",
+      options: [
+        { id: "Tiết kiệm", icon: "🎒", title: "Tiết kiệm", desc: "Homestay, quán ăn bình dân (< 1 triệu/ngày)" },
+        { id: "Tiêu chuẩn", icon: "🏨", title: "Tiêu chuẩn", desc: "Khách sạn 3-4 sao, nhà hàng chất lượng (1 - 3 triệu/ngày)" },
+        { id: "Cao cấp", icon: "💎", title: "Cao cấp / Sang chảnh", desc: "Resort 5 sao, dịch vụ xa xỉ (> 3 triệu/ngày)" }
+      ]
+    },
+    4: {
+      title: "⚡ Nhịp độ chuyến đi mong muốn?",
+      subtitle: "Bạn muốn đi chơi dồn dập hay nghỉ ngơi thong thả?",
+      type: "single",
+      options: [
+        { id: "Thong thả", icon: "☕", title: "Thong thả & Thư giãn", desc: "Ít điểm đến, thời gian nghỉ ngơi thoải mái" },
+        { id: "Cân bằng", icon: "⚖️", title: "Cân bằng & Vừa sức", desc: "Kết hợp hài hòa giữa tham quan và nghỉ ngơi" },
+        { id: "Dày đặc", icon: "🚀", title: "Dày đặc & Khám phá", desc: "Tối đa hóa điểm đến, trải nghiệm tối đa" }
+      ]
+    }
+  };
+
+  // Khởi tạo render lần đầu
+  renderStep();
+
+  function renderStep() {
+    const config = stepsConfig[currentStep];
+
+    // Update Top Progress Bar
+    document.getElementById('progress-bar').style.width = `${(currentStep / totalSteps) * 100}%`;
+    document.getElementById('step-indicator').innerText = `Bước ${currentStep}/${totalSteps}`;
+
+    // Update Header Text
+    document.getElementById('question-title').innerHTML = config.title;
+    document.getElementById('question-subtitle').innerText = config.subtitle;
+
+    // Update Button Text
+    document.getElementById('btn-next-text').innerText = (currentStep === totalSteps) ? "Hoàn tất ✨" : "Tiếp tục";
+
+    // Update Counter Badge
+    updateBadge();
+
+    // Render Options Cards
+    const container = document.getElementById('options-container');
+    container.innerHTML = '';
+
+    // Điều chỉnh layout grid theo số lượng option
+    if (config.options.length <= 4) {
+      container.className = "grid grid-cols-1 sm:grid-cols-2 gap-4 my-auto max-w-2xl mx-auto w-full";
+    } else {
+      container.className = "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 my-auto";
+    }
+
+    config.options.forEach(opt => {
+      const isSelected = isOptionSelected(config.type, opt.id);
+      
+      const card = document.createElement('button');
+      card.type = 'button';
+      card.className = `selection-card relative text-left p-4 sm:p-5 rounded-xl border-2 cursor-pointer group focus:outline-none transition-all ${
+        isSelected 
+          ? 'border-[#355A3C] bg-emerald-50/50 shadow-sm' 
+          : 'border-slate-200 bg-white hover:border-slate-300 hover:shadow-md'
+      }`;
+      card.style.borderColor = isSelected ? '#355A3C' : '';
+
+      card.onclick = () => selectOption(config.type, opt.id);
+
+      card.innerHTML = `
+        ${isSelected ? `
+          <span class="absolute top-3.5 right-3.5 w-5 h-5 rounded-full text-white flex items-center justify-center text-xs font-bold" style="background-color: #355A3C;">
+            ✓
+          </span>
+        ` : ''}
+        <div class="text-3xl mb-2.5">${opt.icon}</div>
+        <h2 class="text-base font-bold text-slate-900 group-hover:text-emerald-800 transition-colors">${opt.title}</h2>
+        <p class="text-xs text-slate-500 mt-1">${opt.desc}</p>
+      `;
+
+      container.appendChild(card);
+    });
+  }
+
+  function isOptionSelected(type, id) {
+    if (type === 'multi') {
+      return surveyData.experiences.includes(id);
+    } else if (currentStep === 2) {
+      return surveyData.companion === id;
+    } else if (currentStep === 3) {
+      return surveyData.budget === id;
+    } else if (currentStep === 4) {
+      return surveyData.pace === id;
+    }
+    return false;
+  }
+
+  function selectOption(type, id) {
+    if (type === 'multi') {
+      const idx = surveyData.experiences.indexOf(id);
+      if (idx > -1) {
+        surveyData.experiences.splice(idx, 1);
+      } else {
+        surveyData.experiences.push(id);
+      }
+    } else {
+      if (currentStep === 2) surveyData.companion = id;
+      if (currentStep === 3) surveyData.budget = id;
+      if (currentStep === 4) surveyData.pace = id;
+    }
+    renderStep();
+  }
+
+  function updateBadge() {
+    const badge = document.getElementById('badge-counter');
+    if (currentStep === 1) {
+      badge.style.display = 'inline-flex';
+      badge.innerText = `Đã chọn: ${surveyData.experiences.length} / 9`;
+    } else {
+      badge.style.display = 'none';
+    }
+  }
+
+  function nextStep() {
+    if (currentStep < totalSteps) {
+      currentStep++;
+      renderStep();
+    } else {
+      // Lưu kết quả vào localStorage và chuyển về trang chủ
+      localStorage.setItem('user_survey_profile', JSON.stringify(surveyData));
+      window.location.href = 'index.html';
+    }
+  }
+
+  function skipQuestion() {
+    // Bỏ qua câu hỏi hiện tại (reset giá trị câu này) và sang bước kế tiếp
+    if (currentStep === 1) surveyData.experiences = [];
+    if (currentStep === 2) surveyData.companion = '';
+    if (currentStep === 3) surveyData.budget = '';
+    if (currentStep === 4) surveyData.pace = '';
+
+    nextStep();
+  }
+
+  function prevStep() {
+    if (currentStep > 1) {
+      currentStep--;
+      renderStep();
+    } else {
+      window.history.back();
+    }
+  }
+</script>
+
+</body>
+</html>
